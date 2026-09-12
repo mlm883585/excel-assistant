@@ -33,3 +33,5 @@ git check-ignore build/ExcelAssistant/ExcelAssistant.exe runtime/WebView2Standal
 ```
 
 不要使用 `git add -f` 绕过客户数据和凭据的忽略规则。需要版本管理的测试表格应使用合成数据，并放入明确的测试 fixture 目录；本次没有用通配符忽略所有 Excel 文件，避免掩盖必要测试样本。
+
+交付包内的对应源码同样使用 Git 跟踪清单，不会收集未跟踪的本地 JSON 配置、`.env` 或缓存。源码包携带 `source-files.json`，用于无 `.git` 目录时重建；禁止手工把客户文件加入该清单。

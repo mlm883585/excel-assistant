@@ -58,7 +58,10 @@ class IntegrationTests(unittest.TestCase):
 
     def test_actual_qwen_cli_sdk_local_model_stub(self):
         cli=ROOT/'node_modules/@qwen-code/qwen-code/cli.js'
-        if not cli.exists(): self.skipTest('Run npm ci for the pinned CLI integration test')
+        if not cli.exists():
+            if os.environ.get('REQUIRE_QWEN_CLI') == '1':
+                self.fail('CI requires the pinned Qwen CLI; run npm ci first')
+            self.skipTest('Run npm ci for the pinned CLI integration test')
         requests=[]
         fixture={"execute":False,"file_id":None}
         class Handler(BaseHTTPRequestHandler):

@@ -4,11 +4,13 @@
 
 | 检查 | 结果 |
 | --- | --- |
-| `python -m unittest discover -s tests -v` | 18 项通过，包含 100000 行完整导出、编码、关联、对账、转换、模板、权限、规则及取消 |
+| `python -m unittest discover -s tests -v` | 23 项通过，包含 100000 行完整导出、编码、关联、对账、转换、模板、权限、规则、取消及源码归档 |
 | 真实 Qwen CLI + Python SDK + 本地 HTTP 模型模拟服务 | 接口连接、会话记录、工具调用、MCP 输出生成通过；无工具产物时拒绝成功 |
 | 模型可见工具 | 未暴露 Shell、文件读取、子 Agent 和网络抓取工具 |
 | `npm run build --prefix gui` | TypeScript 检查和生产构建通过；存在前端主包体积提示 |
 | `pip check` | 无依赖冲突 |
+| 全新 Git 检出与独立虚拟环境 | 从官方 PyPI 安装锁定依赖、重新执行两处 `npm ci`；23 项测试和前端构建通过，未借用历史项目快照 |
+| 对应源码归档 | 未跟踪配置排除、已跟踪敏感文件拒绝、清单越界拒绝、无 Git 重建和无 WebView2 介质归档均通过 |
 | 打包后的 `ExcelAssistant.exe --smoke` | WebView2 启动及页面脚本执行通过，退出码 0 |
 | `scripts/smoke_frozen_mcp.py` | 打包后的 MCP 通过真实 stdio 协议生成 Excel，正常退出 |
 | 随包 Node + Qwen CLI | 输出 0.23.3 |

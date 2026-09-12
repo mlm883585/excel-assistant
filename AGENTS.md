@@ -2,56 +2,39 @@
 
 ## 项目结构与模块组织
 
-根目录现在是 ExcelAssistant 应用：`main.py` 启动 PPX，`gui/` 为 Vue/TypeScript，`api/` 为 RPC，`assistant/` 为任务、Agent、MCP 服务，`data_toolkit/` 为迁入的数据核心，`vendor/` 保存固定上游源码。`docs/` 的两个项目作为原始快照，新增开发默认针对根目录应用。
+本仓库为 Windows 内网 Excel 助手。`main.py` 启动 PPX；`gui/src/` 为 Vue 3 / TypeScript 界面；`api/` 提供 RPC；`assistant/` 实现任务、模型适配、Excel 与 MCP 服务；`data_toolkit/` 为迁入的数据处理核心。
 
-当前应用验证命令：`.venv\Scripts\python.exe -m unittest discover -s tests -v`、`npm run build --prefix gui`；启动 `.venv\Scripts\python.exe main.py`，打包 `.venv\Scripts\python.exe scripts/build.py`。真实 Qwen CLI 测试使用本地模型模拟服务，不能替代客户模型验收。Python 任意代码执行在隔离验收前不得开放。
+`tests/` 保存 unittest 测试；`scripts/` 提供检查、打包与离线介质准备；`docs/` 保存实现和验收文档。`vendor/` 是固定的 PPX、Qwen SDK 源码，`ppx/assets/` 是打包资源，均须提交。两个历史项目快照只在本地保留，不是运行依赖，不提交其嵌套仓库。
 
-以下为保留的两个旧项目；修改前先确定所属项目，避免跨项目耦合。
+## 构建、测试与开发命令
 
-| 路径 | 用途 |
-| --- | --- |
-| `docs/office-assistant-main/` | Windows WPF / WebView2 办公客户端；`src/` 分为 Contracts、Core、Infrastructure、Desktop，`tests/` 按项目对应组织 |
-| `docs/office-assistant-main/renderer/build/` | GenOffice 渲染器适配与构建脚本；文档图片位于 `docs/images/` |
-| `docs/datacraft-toolkit/datacraft-toolkit/` | Python 数据工具；`src/data_toolkit/` 为核心模块，`tests/` 为测试，`examples/` 为配置及示例 |
-
-两项目各自维护 `scripts/`、`tools/` 和 `config/`。不要编辑 `__MACOSX/` 或 `._*` 解压元数据。
-
-## 构建、测试与本地开发
-
-Office AI：先执行 `cd docs/office-assistant-main`。使用 Windows 和 `global.json` 指定的 .NET SDK（当前为 9.0.313）；桌面项目目标为 `net8.0-windows`。
+使用 Windows、Python 3.13.5、Node 24.13.0，在仓库根目录执行：
 
 ```powershell
-dotnet restore .\OfficeAI.slnx
-dotnet build .\OfficeAI.slnx -c Release --no-restore
-dotnet test .\OfficeAI.slnx -c Release --no-restore
-.\scripts\Run-Dev.ps1
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.lock.txt ./vendor/qwen-code-sdk
+npm ci
+npm ci --prefix gui
+npm run build --prefix gui
+.\.venv\Scripts\python.exe main.py
 ```
 
-以上依次还原依赖、构建、测试、发布并启动开发客户端。渲染器构建另需 Node 24+ 和固定版本 GenOffice 源码，通过 `renderer/build/Build-Renderer.ps1 -GenofficeRoot <源码路径>` 指定。
-
-DataCraft：从根目录进入 `docs/datacraft-toolkit/datacraft-toolkit` 后执行：
-
-```powershell
-py -3.13 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-database.txt
-.\.venv\Scripts\python.exe src\data_tool.py --help
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
-```
-
-以上创建环境、安装完整依赖、查看 CLI 用法并运行测试。
+前端构建同时执行 TypeScript 检查。运行 `.venv\Scripts\python.exe -m unittest discover -s tests -v` 验证业务与协议；运行 `.venv\Scripts\python.exe scripts/build.py` 生成 Windows 便携包。先执行 `scripts/fetch_webview2.ps1` 可附加经过签名验证的离线安装介质。
 
 ## 编码风格与命名
 
-C#、Python 使用四空格缩进；C# 类型和公开成员使用 PascalCase，Python 函数及模块使用 snake_case。C# 保持可空引用检查，构建将警告视为错误。TypeScript 沿用相邻文件的两空格、单引号风格。当前未发现统一格式化或 lint 配置，避免无关的整文件重排。
+Python 使用四空格缩进和 snake_case；Vue/TypeScript 使用两空格和相邻代码的单引号风格。避免无关重排。保持业务模块独立于 UI，通过显式注册的 PPX RPC 和任务范围内的 MCP 接口调用。修改上游源码时保留许可证，并同步 `THIRD_PARTY_NOTICES.md`。
 
-## 测试要求
+## 测试与验收
 
-Office AI 使用 xUnit，测试文件命名为 `*Tests.cs`；新增功能配套行为测试，安全校验先覆盖拒绝场景。DataCraft 使用 unittest，文件命名为 `test_*.py`。未发现数值覆盖率门槛。使用临时目录和合成样本；文档格式变更还需在真实 Office 2016 x64 中验证，单元测试不能替代兼容性验收。
+测试文件命名为 `test_*.py`，使用临时目录与合成数据。数据变更覆盖编码保留、原始行号、重复键、异常记录和输出完整性；Agent 变更验证工具权限、会话、失败与取消。
+
+CI 必须安装固定 Qwen CLI，不能跳过真实 CLI 与本地模拟模型的协议测试。这些测试不代表客户模型能力；Excel 2016、客户内网断外网运行与业务人员试用仍按验收清单实测。生成 Python 在操作系统隔离验收前保持关闭。
 
 ## 提交与 Pull Request
 
-根目录为当前应用主仓库，远程为 `mlm883585/excel-assistant`，默认分支 `main`。采用简短英文 Conventional Commits，例如 `fix: preserve source row numbers`。PR 说明目的、用户影响、验证命令和外部验收事项；有关联 issue 时附链接，界面变更附脱敏截图。旧项目快照仅在本地保留，不提交其嵌套 Git 仓库、客户资料或生成产物。
+远程为 `mlm883585/excel-assistant`，默认分支 `main`。使用 Conventional Commits，例如 `fix: preserve source row numbers`。PR 说明用户影响、验证结果和剩余外部验收；界面变更附脱敏截图。提交源码、锁文件和许可证，忽略依赖、缓存、安装包与旧快照。
 
 ## 配置与安全
 
-不得提交客户文档、内网地址、凭据、证书、日志或生成产物。数据库密码通过环境变量提供。保持文件工作副本、只读查询和网络允许列表等安全边界。旧文档与源码冲突时，先核对项目文件和脚本，再同步更新说明。
+不得提交客户文件、密钥、内网地址、任务数据库或运行日志。密钥通过环境变量配置。保持任务文件副本、明确的路径范围和工具允许列表；源码归档使用 Git 跟踪清单，禁止扫描整目录打包本地配置。
