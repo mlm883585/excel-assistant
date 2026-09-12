@@ -35,6 +35,8 @@ class Jobs:
     def __init__(self, store):
         self.store = store
         self.processes = {}
+        self.watchers = []
+        self.closed = False
         self.lock = threading.Lock()
         for task in store.list():
             if task["status"] in {"running", "waiting"}:
@@ -45,6 +47,8 @@ class Jobs:
         if prompt is None:
             plan = OperationPlan.model_validate(plan).model_dump()
         with self.lock:
+            if self.closed:
+                raise ValueError("任务管理器已关闭")
             if any(p.is_alive() for p in self.processes.values()):
                 raise ValueError("首版一次执行一个任务，请等待或取消当前任务")
             record = self.store.get(task_id)
@@ -56,7 +60,10 @@ class Jobs:
             process = multiprocessing.get_context("spawn").Process(target=worker, args=(str(self.store.root), task_id, plan, prompt, config or {}))
             process.start()
             self.processes[task_id] = process
-            threading.Thread(target=self._watch, args=(task_id, process), daemon=True).start()
+            watcher = threading.Thread(target=self._watch, args=(task_id, process), daemon=True)
+            self.watchers = [w for w in self.watchers if w.is_alive()]
+            self.watchers.append(watcher)
+            watcher.start()
         return {"task_id": task_id}
 
     def _watch(self, task_id, process):
@@ -64,10 +71,12 @@ class Jobs:
         if process.is_alive():
             self.cancel(task_id)
             self.store.event(task_id, "error", "任务超过 30 分钟，已取消")
-        elif self.store.get(task_id)["status"] in {"running", "waiting"}:
-            record = self.store.get(task_id)
-            record.update(status="failed", error="工作进程异常退出")
-            self.store.save(record)
+        else:
+            with self.lock:
+                record = self.store.get(task_id)
+                if record["status"] in {"running", "waiting"}:
+                    record.update(status="failed", error="工作进程异常退出")
+                    self.store.save(record)
 
     def cancel(self, task_id):
         import psutil
@@ -107,5 +116,13 @@ class Jobs:
             return True
 
     def close(self):
-        for task_id in list(self.processes):
+        with self.lock:
+            self.closed = True
+            task_ids = list(self.processes)
+            watchers = list(self.watchers)
+        for task_id in task_ids:
             self.cancel(task_id)
+        # A worker can finish before its watcher releases the SQLite connection.
+        # Finish all observers before callers dispose of the task directory.
+        for watcher in watchers:
+            watcher.join()

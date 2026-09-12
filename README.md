@@ -35,7 +35,7 @@ npm run build --prefix gui
 .\.venv\Scripts\python.exe scripts/build.py
 ```
 
-推送至 `main` 或创建 PR 后，GitHub 的 `Windows CI` 会在固定 Python/Node 环境运行测试与前端构建。通过 Actions 的手动入口勾选 `build_portable`，可额外构建并验证便携包；该步骤不会自动创建 Release。
+默认在本地运行测试与编译，不因推送或 PR 自动消耗 GitHub Actions 配额。`Windows CI` 仅保留手动入口，获得明确授权后才运行；勾选 `build_portable` 可额外构建并验证便携包，该步骤不会自动创建 Release。
 
 对应源码按 Git 跟踪清单归档，与 WebView2 安装介质是否存在无关。解压交付包内的 `corresponding-source.zip` 后，也可通过内置源码清单重新打包。开发构建请使用 Git 克隆或该对应源码包，不依赖本地历史快照。
 

@@ -2,6 +2,7 @@ import asyncio
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
+from unittest.mock import patch
 import sys
 import tempfile
 import threading
@@ -17,6 +18,48 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class IntegrationTests(unittest.TestCase):
+    def test_close_waits_for_worker_observer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp) / 'data')
+            task = store.create()['id']
+            source = Path(tmp) / 'input.csv'
+            source.write_text('code,qty\nA,2\n')
+            file = store.import_file(task, source)
+            jobs = Jobs(store)
+            observer_entered = threading.Event()
+            release_observer = threading.Event()
+            closed = threading.Event()
+            original_watch = jobs._watch
+
+            def delayed_watch(task_id, process):
+                observer_entered.set()
+                release_observer.wait(30)
+                original_watch(task_id, process)
+
+            def close():
+                jobs.close()
+                closed.set()
+
+            closer = None
+            try:
+                with patch.object(jobs, '_watch', side_effect=delayed_watch):
+                    jobs.start(task, plan={'steps': [{'kind': 'append', 'inputs': [{'file_id': file['id']}], 'params': {}}]})
+                    self.assertTrue(observer_entered.wait(5))
+                    jobs.processes[task].join(30)
+                    self.assertFalse(jobs.processes[task].is_alive())
+                    closer = threading.Thread(target=close)
+                    closer.start()
+                    self.assertFalse(closed.wait(0.1), 'close returned before observer released the database')
+            finally:
+                release_observer.set()
+                if closer is not None:
+                    closer.join(10)
+                jobs.close()
+            self.assertTrue(closed.is_set())
+            self.assertTrue(all(not watcher.is_alive() for watcher in jobs.watchers))
+            with self.assertRaisesRegex(ValueError, '已关闭'):
+                jobs.start(task, prompt='must not restart after close')
+
     def test_mcp_stdio_real_transport(self):
         from mcp import ClientSession, StdioServerParameters
         from mcp.client.stdio import stdio_client
@@ -49,12 +92,14 @@ class IntegrationTests(unittest.TestCase):
             source = Path(tmp)/'data.csv'; source.write_text('code,qty\nA,2\nA,3\n')
             file = store.import_file(task,source)
             jobs = Jobs(store)
-            jobs.start(task,plan={'steps':[{'kind':'group','inputs':[{'file_id':file['id']}],'params':{'keys':['code'],'columns':['qty']}}]})
-            process=jobs.processes[task]; process.join(30)
-            self.assertFalse(process.is_alive())
-            self.assertEqual(store.get(task)['status'],'succeeded')
-            self.assertEqual(len(store.get(task)['outputs']),1)
-            jobs.close()
+            try:
+                jobs.start(task,plan={'steps':[{'kind':'group','inputs':[{'file_id':file['id']}],'params':{'keys':['code'],'columns':['qty']}}]})
+                process=jobs.processes[task]; process.join(30)
+                self.assertFalse(process.is_alive())
+                self.assertEqual(store.get(task)['status'],'succeeded')
+                self.assertEqual(len(store.get(task)['outputs']),1)
+            finally:
+                jobs.close()
 
     def test_actual_qwen_cli_sdk_local_model_stub(self):
         cli=ROOT/'node_modules/@qwen-code/qwen-code/cli.js'
@@ -114,10 +159,13 @@ class IntegrationTests(unittest.TestCase):
             source=Path(tmp)/'data.csv';source.write_text('code,qty\nA,2\n')
             file=store.import_file(task,source)
             jobs=Jobs(store)
-            jobs.start(task,plan={'steps':[{'kind':'append','inputs':[{'file_id':file['id']}]}]})
-            self.assertTrue(jobs.cancel(task))
-            self.assertFalse(jobs.processes[task].is_alive())
-            self.assertEqual(store.get(task)['status'],'cancelled')
+            try:
+                jobs.start(task,plan={'steps':[{'kind':'append','inputs':[{'file_id':file['id']}]}]})
+                self.assertTrue(jobs.cancel(task))
+                self.assertFalse(jobs.processes[task].is_alive())
+                self.assertEqual(store.get(task)['status'],'cancelled')
+            finally:
+                jobs.close()
 
 
 if __name__=='__main__': unittest.main()
