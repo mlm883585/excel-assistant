@@ -50,7 +50,7 @@ Office AI 使用 xUnit，测试文件命名为 `*Tests.cs`；新增功能配套�
 
 ## 提交与 Pull Request
 
-根目录没有 Git 元数据；DataCraft 当前历史仅有 `Initial release of DataCraft data workbench`，不足以推断统一惯例。遵循 Office AI 的贡献指南，采用简短英文 Conventional Commits，例如 `fix: reject invalid editor origins`。PR 说明目的、用户影响、验证命令和外部验收事项；有关联 issue 时附链接，界面变更附脱敏截图。
+根目录为当前应用主仓库，远程为 `mlm883585/excel-assistant`，默认分支 `main`。采用简短英文 Conventional Commits，例如 `fix: preserve source row numbers`。PR 说明目的、用户影响、验证命令和外部验收事项；有关联 issue 时附链接，界面变更附脱敏截图。旧项目快照仅在本地保留，不提交其嵌套 Git 仓库、客户资料或生成产物。
 
 ## 配置与安全
 
