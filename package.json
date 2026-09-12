@@ -1,0 +1,7 @@
+{
+  "name": "excel-assistant-runtime",
+  "private": true,
+  "version": "0.1.0",
+  "engines": {"node": "24.13.0"},
+  "dependencies": {"@qwen-code/qwen-code": "0.23.3"}
+}

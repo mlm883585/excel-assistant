@@ -1,0 +1,39 @@
+[project]
+name = "ExcelAssistant"
+slug = "excel-assistant"
+version = "0.1.0"
+identifier = "local.excelassistant"
+developer = "Excel Assistant Contributors"
+description = "内网 Excel 数据助手"
+website = ""
+windowsAppId = "7DE6FAF4-4CE3-4D70-BD01-9D79B07BFA42"
+format = 6
+[python]
+modules = ["api.api"]
+[paths]
+frontend = "gui"
+resources = "api/resources"
+assets = "ppx/assets"
+[window]
+widthRatio = 0.85
+heightRatio = 0.85
+minWidthRatio = 0.7
+minHeightRatio = 0.7
+resizable = true
+backgroundColor = "#F3F6FA"
+[development]
+port = 5173
+[storage]
+filename = "preferences.json"
+[applicationUpdate]
+enabled = false
+releaseUrl = ""
+[compatibility]
+pythonApi = "6.0"
+javascriptApi = "6.0"
+dataSchema = "1"
+[framework]
+python = "6.0.0"
+javascript = "6.0.0"
+channel = "stable"
+releaseUrl = ""

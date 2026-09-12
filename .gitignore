@@ -1,0 +1,57 @@
+.venv/
+__pycache__/
+*.pyc
+node_modules/
+gui/dist/
+build/
+runtime/
+wheelhouse/
+*.log
+.env
+
+# Local reference snapshots; the current app has its own migrated sources.
+/docs/office-assistant-main/
+/docs/datacraft-toolkit/
+
+# Local caches, build metadata and editor state.
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.egg-info/
+*.tsbuildinfo
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+__MACOSX/
+._*
+
+# Credentials, customer files and task state belong outside source control.
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.pfx
+*.p12
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+/customer-data/
+/task-data/
+/model.json
+/answer.json
+
+# Distributable binaries and archives are release artifacts, not source.
+*.exe
+*.msi
+*.msix
+*.zip
+*.7z
+*.whl
