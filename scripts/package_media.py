@@ -43,6 +43,9 @@ def package_media(root=None):
         updated.append(destination/name)
     shutil.copy2(root/'docs/OFFLINE_ACCEPTANCE.md',destination/'OFFLINE_ACCEPTANCE.md')
     updated.append(destination/'OFFLINE_ACCEPTANCE.md')
+    if (root/'docs/ENVIRONMENT.md').is_file():
+        shutil.copy2(root/'docs/ENVIRONMENT.md',destination/'ENVIRONMENT.md')
+        updated.append(destination/'ENVIRONMENT.md')
     source_archive=destination/'corresponding-source.zip'
     write_source_archive(root,source_archive)
     updated.append(source_archive)

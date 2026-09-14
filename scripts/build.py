@@ -19,6 +19,10 @@ def copy_changed(source, target):
 
 
 def main():
+    from qwen_code_sdk.types import QueryOptions
+    from qwen_code_sdk.transport import prepare_spawn_info
+    if 'node_executable' not in QueryOptions.__dataclass_fields__ or prepare_spawn_info(str(ROOT/'probe.js'), 'explicit-node').command != 'explicit-node':
+        raise RuntimeError('请先从 vendor/qwen-code-sdk 重新安装本项目修改后的 SDK')
     from ppx_py.settings import Settings
     from ppx_py.packaging.spec import create_spec
     subprocess.run(['npm.cmd', 'run', 'build', '--prefix', str(ROOT/'gui')], check=True)
@@ -28,6 +32,8 @@ def main():
     content = content.replace(str(ROOT/'build/cache/ppx_entry.py').__repr__(), str(ROOT/'main.py').__repr__())
     # PPX source is pinned locally, and pywebview/pythonnet require their managed assets.
     content = content.replace(f'pathex=[{str(ROOT)!r}]', f'pathex=[{str(ROOT)!r}, {str(ROOT / "vendor/ppx-py/src")!r}]')
+    # Diagnostics imports MCP dynamically; declare it for the desktop worker too.
+    content = content.replace('hiddenimports=[', "hiddenimports=['mcp', ")
     spec.write_text(content, encoding='utf-8')
     subprocess.run([sys.executable,'-m','PyInstaller','--noconfirm','--distpath',str(ROOT/'build'),'--workpath',str(ROOT/'build/cache/work'),str(spec)],check=True,cwd=ROOT)
     subprocess.run([sys.executable,'-m','PyInstaller','--noconfirm','--onedir','--name','DataCraftMCP','--distpath',str(ROOT/'build/mcp'),'--workpath',str(ROOT/'build/cache/mcp'),'--specpath',str(ROOT/'build/cache'),'--paths',str(ROOT),str(ROOT/'mcp_entry.py')],check=True,cwd=ROOT)

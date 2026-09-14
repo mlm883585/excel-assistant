@@ -25,7 +25,7 @@ class SpawnInfo:
     args: list[str]
 
 
-def prepare_spawn_info(path_to_qwen_executable: str | None) -> SpawnInfo:
+def prepare_spawn_info(path_to_qwen_executable: str | None, node_executable: str | None = None) -> SpawnInfo:
     if path_to_qwen_executable is None:
         return SpawnInfo(command="qwen", args=[])
 
@@ -41,7 +41,7 @@ def prepare_spawn_info(path_to_qwen_executable: str | None) -> SpawnInfo:
     if suffix == ".py":
         return SpawnInfo(command=sys.executable, args=[str(path)])
     if suffix in {".js", ".mjs", ".cjs"}:
-        return SpawnInfo(command="node", args=[str(path)])
+        return SpawnInfo(command=node_executable or "node", args=[str(path)])
 
     return SpawnInfo(command=str(path), args=[])
 
@@ -69,7 +69,7 @@ class ProcessTransport:
         if self._process is not None:
             return
 
-        spawn_info = prepare_spawn_info(self._options.path_to_qwen_executable)
+        spawn_info = prepare_spawn_info(self._options.path_to_qwen_executable, self._options.node_executable)
         args = [*spawn_info.args, *build_cli_arguments(self._options)]
         stderr_target = (
             asyncio.subprocess.PIPE
