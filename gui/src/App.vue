@@ -1,115 +1,185 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { ppx } from 'ppx-js'
-import EnvironmentPanel from './EnvironmentPanel.vue'
-
-type FileInfo = { id: string; name: string; statistics?: Record<string, unknown>; issues?: unknown[] }
-type Task = { id: string; status: string; files: FileInfo[]; outputs: FileInfo[]; error?: string }
-type Selection = { file_id: string; sheet: string | number; header_row: number }
-type Event = { id: number; kind: string; data: any }
-const task = ref<Task>(), history = ref<Task[]>([]), events = ref<Event[]>([])
-const environmentOpen = ref(false), startupError = ref('')
-const runtimeStatus = ref({ready:false, excel_ready:false, first_use:false, message:'运行环境尚未检查'})
-async function refreshEnvironment() { runtimeStatus.value = await call('runtime.status') }
-const selections = ref<Selection[]>([]), sheets = ref<Record<string, string[]>>({})
-const preview = ref<{columns: string[]; rows: Record<string, unknown>[]; total: number}>({columns: [], rows: [], total: 0})
-const activeFile = ref(''), page = ref(1), prompt = ref(''), operation = ref('append')
-const keys = ref<string[]>([]), columns = ref<string[]>([]), pivotColumn = ref(''), pivotValue = ref('')
-const busy = computed(() => ['running', 'waiting'].includes(task.value?.status || ''))
-const fields = computed(() => preview.value.columns.filter(c => !c.startsWith('__source_')))
-const settingsOpen = ref(false), settings = ref({base_url: '', model: ''}), recipes = ref<any[]>([])
-const answers = ref<Record<string,string>>({}), question = ref<any>(null)
-const templateSheet = ref(''), templateStart = ref(2), templateMapping = ref<Record<string,string>>({})
-const labels: Record<string,string> = {pending:'待执行',running:'处理中',waiting:'等待回答',succeeded:'已完成',failed:'需处理',cancelled:'已取消'}
-let timer: ReturnType<typeof setInterval> | undefined, polling = false
-async function call<T=any>(method: string, params: unknown = {}): Promise<T> { return ppx.call<T>(method, params, {timeoutMs: 60000}) }
-async function action(fn: () => Promise<unknown>) { try { await fn() } catch (e) { ElMessage.error(e instanceof Error ? e.message : String(e)) } }
-async function refreshLists() { history.value = await call('tasks.list'); recipes.value = await call('recipes.list') }
-async function selectTask(value: Task) {
-  task.value = value; events.value = []; question.value = null; selections.value = []; sheets.value = {}; activeFile.value = ''; preview.value = {columns:[],rows:[],total:0}
-  for (const file of value.files) {
-    const info = await call('files.inspect', {task_id:value.id,file_id:file.id})
-    sheets.value[file.id] = info.sheets
-    selections.value.push({file_id:file.id,sheet:info.sheets[0] === 'CSV' ? 0 : info.sheets[0],header_row:1})
-  }
-  if (value.files[0]) activeFile.value = value.files[0].id
-  await poll()
-}
-async function newTask() { await selectTask(await call('tasks.create')); await refreshLists() }
-async function addFiles() { await call('files.choose',{task_id:task.value!.id}); const result = await call('tasks.get',{task_id:task.value!.id}); await selectTask(result.task) }
-async function loadPreview() {
-  const selection = selections.value.find(s => s.file_id === activeFile.value) || {file_id:activeFile.value,sheet:0,header_row:1}
-  preview.value = await call('files.preview',{task_id:task.value!.id,selection,offset:(page.value-1)*50,limit:50})
-}
-async function poll() {
-  if (!task.value || polling) return
-  polling = true
-  const id = task.value.id
-  try {
-    const result = await call('tasks.get',{task_id:id,after:events.value.at(-1)?.id || 0})
-    if (task.value?.id !== id) return
-    task.value = result.task; events.value.push(...result.events)
-    for (const event of result.events) if (event.kind === 'question') { question.value = event.data; answers.value = {} }
-    if (task.value?.status !== 'waiting') question.value = null
-  } finally { polling = false }
-}
-async function run() {
-  const params: Record<string,unknown> = {keys:keys.value,columns:columns.value,validate:'many_to_one',how:'left',aggregate:'sum'}
-  if (operation.value === 'clean') params.config = {schema_version:1,columns:Object.fromEntries(columns.value.map(c=>[c,{type:'string',trim:true}]))}
-  if (operation.value === 'pivot') Object.assign(params,{column:pivotColumn.value,value:pivotValue.value})
-  if (operation.value === 'template') Object.assign(params,{sheet:templateSheet.value,start_row:templateStart.value,mapping:templateMapping.value})
-  const multiple = ['append','join','compare','template'].includes(operation.value)
-  await call('tasks.execute',{task_id:task.value!.id,plan:{steps:[{kind:operation.value,inputs:multiple?selections.value:selections.value.filter(s=>s.file_id===activeFile.value),params}],questions:[]}})
-  await poll()
-}
-async function askAgent() { await call('tasks.agent',{task_id:task.value!.id,prompt:prompt.value,selections:selections.value}); prompt.value=''; await poll() }
-async function saveRecipe() { const result = await ElMessageBox.prompt('为这套处理步骤命名','保存常用任务'); await call('recipes.save',{task_id:task.value!.id,name:result.value}); await refreshLists() }
-onMounted(async()=> {
-  await action(async()=> { await refreshEnvironment(); environmentOpen.value=runtimeStatus.value.first_use })
-  await action(async()=> { settings.value=await call('settings.get') })
-  try { await refreshLists(); if(history.value[0]) await selectTask(history.value[0]); else await newTask(); timer=setInterval(()=>action(poll),1200) }
-  catch(e) { startupError.value=String(e); environmentOpen.value=true }
+import FilePreview from './FilePreview.vue'
+import ResultPanel from './ResultPanel.vue'
+import RuleFields from './RuleFields.vue'
+import { call, statusLabels, type Task, type Selection } from './rpc'
+import { useTaskSession } from './composables/useTaskSession'
+import { useWorkbookSession } from './composables/useWorkbookSession'
+import type { WorkbookContext, WorkbookSelection } from './workbook/types'
+const EnvironmentPanel = defineAsyncComponent(() => import('./EnvironmentPanel.vue'))
+const WorkbookEditor = defineAsyncComponent(() => import('./WorkbookEditor.vue'))
+const ruleFields = ref<{ params: () => Record<string, unknown> }>()
+const submitting = ref(false)
+const environmentOpen = ref(false), environmentLoaded = ref(false), startupError = ref('')
+const runtime = ref({ ready: false, excel_ready: false, first_use: false, message: '' })
+const mode = ref('tools'), prompt = ref('')
+const activeFile = ref(''), fields = ref<string[]>([]), selections = ref<Record<string, Selection>>({})
+const operation = ref('append'), keys = ref<string[]>([]), columns = ref<string[]>([])
+const left = ref(''), right = ref(''), pivotColumn = ref(''), pivotValue = ref(''), templateSheet = ref(''), templateStart = ref(2), mapping = ref<Record<string,string>>({})
+const session = useTaskSession({
+  beforeSelect: () => workbook.flush(),
+  reset: () => {
+    workbook.reset()
+    fields.value = []; selections.value = {}; prompt.value = ''
+    keys.value = []; columns.value = []; mapping.value = {}
+  },
+  selected: async record => {
+    activeFile.value = record.files[0]?.id || ''
+    left.value = activeFile.value
+    right.value = record.files[1]?.id || ''
+    await workbook.refreshBooks()
+  },
+  questioned: () => { mode.value = 'agent'; view.value = 'work' },
+  finished: record => { if (record.outputs.length) view.value = 'result' },
+  report: error => ElMessage.error(String(error)),
 })
-onUnmounted(()=>clearInterval(timer))
+const {
+  task, history, moreTasks, recipes, historyOffset, events, moreEvents, cursor,
+  viewingOlder, loading, question, answers, refreshLists, selectTask, poll, older, latest,
+} = session
+const workbook = useWorkbookSession({ task, capture: session.capture, opened: () => { operation.value = 'calculate' } })
+const {
+  editor, workbookId, editorKey, books, workbookContext, inputScope, autoExport,
+  workbookRevision, view, changeView, openBook, bookInput, refreshBooks,
+} = workbook
+const busy = computed(() => session.busy.value || submitting.value)
+const file = computed(() => task.value?.files.find(f => f.id === activeFile.value))
+const selectedInput = (id: string): Selection => selections.value[id] || { file_id: id, sheet: 0, header_row: 1 }
+const operations: Record<string, string> = { calculate: '新增计算列', classify: '条件分级', create_table: '无文件建表', append: '合并文件', join: '按字段关联', clean: '清理文本空格', compare: '对账差异', group: '分组求和', melt: '宽表转长表', pivot: '长表转矩阵 / BOM', template: '填写模板', recalculate: 'Excel 重算副本' }
+const newRule = computed(() => ['calculate','classify','create_table'].includes(operation.value))
+const usesKeys = computed(() => ['join','compare','group','melt','pivot'].includes(operation.value))
+const usesColumns = computed(() => ['clean','compare','group','melt','template'].includes(operation.value))
+const twoFiles = computed(() => ['join','compare','template'].includes(operation.value))
+const displayedEvents = computed(() => events.value.filter(e => ['message','user','progress','error'].includes(e.kind)))
+async function action(fn: () => Promise<unknown>) { try { await fn() } catch (e) { if (e !== 'cancel' && e !== 'close') ElMessage.error(String(e)) } }
+function openEnvironment() { environmentLoaded.value = true; environmentOpen.value = true }
+async function refreshEnvironment() { runtime.value = await call('runtime.status') }
+async function openReviewed(id: string, exportNow = false, outputId?: string) { await openBook(id,undefined,undefined,exportNow?outputId:undefined) }
+function editorContext(value: WorkbookContext) {
+  workbookContext.value = value
+  fields.value = editor.value?.fields(inputScope.value==='range') || []
+}
+async function newTask() {
+  const current = session.capture()
+  await workbook.flush()
+  if (!current()) return
+  const value = await call<Task>('tasks.create')
+  if (!current()) return
+  await selectTask(value.id)
+  await refreshLists()
+}
+async function addFiles() {
+  const id = task.value!.id, current = session.capture()
+  await call('files.choose', { task_id: id })
+  if (!current()) return
+  const record = await call<{ task: Task }>('tasks.get', { task_id: id, after: cursor.value })
+  if (!current()) return
+  task.value = record.task
+  activeFile.value ||= record.task.files[0]?.id || ''
+  left.value ||= activeFile.value
+  right.value ||= record.task.files[1]?.id || ''
+  await refreshLists()
+}
+async function submitTask(method: string, params: Record<string, unknown>) {
+  const id = task.value!.id, current = session.capture()
+  submitting.value = true
+  try {
+    await call(method, { task_id: id, ...params })
+    if (current()) await poll()
+  } finally { submitting.value = false }
+}
+async function applyRecipe(id: string) {
+  const current = session.capture()
+  await workbook.flush()
+  if (current()) await submitTask('recipes.apply', { recipe_id: id })
+}
+function resetOperation() { if (twoFiles.value && left.value) activeFile.value = left.value; keys.value = []; columns.value = []; pivotColumn.value = ''; pivotValue.value = ''; mapping.value = {} }
+async function execute() {
+  const current = session.capture()
+  await workbook.flush()
+  if (!current()) return
+  if (!task.value?.files.length && operation.value!=='create_table' && view.value!=='editor') throw new Error('请先添加文件或新建工作簿')
+  let inputs: (Selection | WorkbookSelection)[] = operation.value==='create_table' ? [] : view.value==='editor' && !twoFiles.value ? [bookInput()] : operation.value === 'append' ? task.value!.files.map(f => selectedInput(f.id)) : [selectedInput(activeFile.value)]
+  if (twoFiles.value) { if (!left.value || !right.value || left.value === right.value) throw new Error('请选择两个不同的文件'); inputs = [selectedInput(left.value), selectedInput(right.value)] }
+  if (usesKeys.value && !keys.value.length) throw new Error('请选择用于关联或分组的字段')
+  if (usesColumns.value && operation.value !== 'compare' && !columns.value.length) throw new Error('请选择要处理的字段')
+  const params: Record<string, unknown> = { keys: keys.value, columns: columns.value, validate: 'many_to_one', how: 'left', aggregate: 'sum' }
+  if (newRule.value) { Object.keys(params).forEach(k=>delete params[k]); Object.assign(params, ruleFields.value!.params()) }
+  if (operation.value === 'clean') params.config = { schema_version: 1, columns: Object.fromEntries(columns.value.map(c => [c, { type: 'string', trim: true }])) }
+  if (operation.value === 'pivot') { if (!pivotColumn.value || !pivotValue.value) throw new Error('请选择列名字段与数量字段'); Object.assign(params, { column: pivotColumn.value, value: pivotValue.value }) }
+  if (operation.value === 'template') {
+    if (columns.value.some(c => !/^[A-Za-z]{1,3}$/.test(mapping.value[c] || ''))) throw new Error('请为每个字段填写有效 Excel 列名，如 A')
+    Object.assign(params, { sheet: templateSheet.value, start_row: templateStart.value, mapping: Object.fromEntries(columns.value.map(c => [c, mapping.value[c].toUpperCase()])) })
+  }
+  await submitTask('tasks.execute', { plan: { steps: [{ kind: operation.value, inputs, params }], questions: [] } })
+}
+async function ask() {
+  const current = session.capture()
+  await workbook.flush()
+  if (!current()) return
+  const selections = view.value==='editor' ? [bookInput()] : task.value!.files.map(f => selectedInput(f.id))
+  const scope = view.value==='editor' ? `\n当前工作表：${workbookContext.value!.sheet_name}；选中区域 ${workbookContext.value!.address}（${JSON.stringify(workbookContext.value!.range)}）。数据输入范围：${inputScope.value==='sheet'?'工作表全部实际数据':'上述选区'}。编辑指定区域时必须核对用户范围。` : ''
+  await submitTask('tasks.agent', { prompt: prompt.value + scope, selections, editing_selection:view.value==='editor'?bookInput(true):undefined }); if (current()) prompt.value = ''
+}
+async function saveRecipe() {
+  const taskId = task.value!.id, current = session.capture()
+  const result = await ElMessageBox.prompt('给这套处理步骤起一个名称', '保存常用任务')
+  if (!current()) return
+  await call('recipes.save', { task_id: taskId, name: result.value })
+  await refreshLists()
+}
+function message(data: unknown): string { return typeof data === 'string' ? data : data && typeof data === 'object' ? String((data as any).message || (data as any).text || '处理状态已更新') : String(data ?? '') }
+onMounted(async () => {
+  void action(refreshEnvironment)
+  try { await refreshLists(); if (history.value[0]) await selectTask(history.value[0].id); else await newTask() }
+  catch (e) { startupError.value = String(e); loading.value = false }
+})
 </script>
 
 <template>
   <div class="shell">
-    <aside><div class="brand"><span class="mark">▦</span> Excel 数据助手</div><p class="muted">内网工作台 · 文件在本机处理</p>
-      <el-button type="primary" class="wide" @click="action(newTask)">＋ 新建任务</el-button>
-      <h4>最近任务</h4><button v-for="item in history" :key="item.id" class="history" :class="{selected:task?.id===item.id}" @click="action(()=>selectTask(item))">{{item.files[0]?.name || '新任务'}}<small>{{labels[item.status]}}</small></button>
-      <h4>常用任务</h4><button v-for="recipe in recipes" :key="recipe.id" class="history" :disabled="busy" @click="action(()=>call('recipes.apply',{task_id:task!.id,recipe_id:recipe.id}))">{{recipe.name}}<small>按原顺序导入 {{recipe.slots.length}} 个替换文件</small></button>
-      <el-button class="settings" @click="settingsOpen=true">模型连接设置</el-button>
-      <el-button @click="environmentOpen=true">环境检测</el-button>
+    <aside class="sidebar"><div class="brand"><span class="mark">▦</span><div>Excel 数据助手<small>内网业务工作台</small></div></div><el-button type="primary" class="wide" :disabled="busy" @click="action(newTask)">＋ 新建任务</el-button>
+      <nav class="task-navigation" aria-label="任务导航"><h3>最近任务</h3><button v-for="item in history" :key="item.id" class="history" :class="{selected:task?.id===item.id}" :disabled="busy && task?.id!==item.id" @click="action(()=>selectTask(item.id))"><span>{{item.name}}</span><small>{{statusLabels[item.status]}}</small></button><el-button v-if="historyOffset" text @click="action(()=>refreshLists())">返回最近任务</el-button><el-button v-if="moreTasks" text @click="action(()=>refreshLists(true))">加载更多任务</el-button>
+      <template v-if="view==='editor' && task?.files.length"><h3>任务文件</h3><button v-for="f in task.files" :key="f.id" class="history" :disabled="busy" @click="action(()=>openBook(undefined,f.id))"><span>▦ {{f.name}}</span><small>打开副本编辑</small></button></template><h3>常用任务</h3><p v-if="!recipes.length" class="muted">完成一次处理后，可将步骤保存到这里。</p><button v-for="recipe in recipes" :key="recipe.id" class="history" :disabled="busy || !task" @click="action(()=>applyRecipe(recipe.id))"><span>{{recipe.name}}</span><small>按保存顺序准备 {{recipe.slots.length}} 份文件</small></button></nav>
+      <button class="settings-link" @click="openEnvironment">⚙ 设置与环境 <span class="status-dot" :class="{ready:runtime.ready}" /></button><p class="local-note">文件在本机处理</p>
     </aside>
-    <main v-if="task"><header><div><div class="eyebrow">从数据到可交付的结果</div><h1>今天，需要整理什么数据？</h1></div><el-tag>{{labels[task.status]}}</el-tag></header>
-      <el-alert v-if="!runtimeStatus.ready" :title="runtimeStatus.message" type="info" :closable="false"><el-button link @click="environmentOpen=true">打开环境检测</el-button>常用操作无需连接模型。</el-alert>
-      <section class="panel"><div class="section-title"><h3>1 · 选择文件与表头</h3><el-button :disabled="busy" @click="action(addFiles)">添加 Excel / CSV</el-button></div>
-        <div v-if="!task.files.length" class="empty">添加 ERP 导出表、库存表、订单表或输出模板，开始一个任务。</div>
-        <div v-for="(file,index) in task.files" :key="file.id" class="file-row"><el-radio v-model="activeFile" :value="file.id">{{index+1}}. {{file.name}}</el-radio><template v-if="selections[index]"><el-select v-model="selections[index].sheet" :disabled="busy" style="width:160px"><el-option v-for="s in sheets[file.id]" :key="s" :label="s" :value="s==='CSV'?0:s"/></el-select><span>表头行</span><el-input-number v-model="selections[index].header_row" :min="1" :max="1048576" :disabled="busy" size="small"/></template></div>
-        <el-button v-if="activeFile" @click="action(async()=>{page=1;await loadPreview()})">读取预览</el-button>
-        <el-table v-if="preview.columns.length" :data="preview.rows" height="260" stripe><el-table-column v-for="col in preview.columns" :key="col" :prop="col" :label="col" min-width="140" show-overflow-tooltip/></el-table>
-        <el-pagination v-if="preview.total" v-model:current-page="page" :page-size="50" :total="preview.total" layout="total, prev, pager, next" @current-change="()=>action(loadPreview)"/>
-      </section>
-      <div class="workspace"><section class="panel"><h3>2 · 描述要求</h3><p class="muted">例如：将库存按物料汇总，再关联订单，列出没有匹配的记录。</p>
-        <div class="conversation"><div v-for="event in events.filter(e=>['message','user','progress','error'].includes(e.kind))" :key="event.id" class="message" :class="event.kind">{{event.data}}</div><div v-if="!events.length" class="empty">也可以使用右侧常用操作，不需要连接模型。</div></div>
-        <div v-if="question"><div v-for="(q,index) in question.questions" :key="index"><p>{{q.question || q.title}}</p><el-input v-model="answers[String(index)]" placeholder="填写业务规则或选择的选项"/><p class="muted">{{q.options?.map((o:any)=>o.label || o).join(' / ')}}</p></div><el-button @click="action(()=>call('tasks.answer',{task_id:task!.id,answers}))">提交回答</el-button></div>
-        <el-input v-model="prompt" type="textarea" :rows="3" placeholder="用业务语言说明你想得到的结果" :disabled="busy"/>
-        <div class="actions"><el-button type="primary" :disabled="busy || !runtimeStatus.ready || !task.files.length || !prompt.trim()" @click="action(askAgent)">开始处理 / 继续对话</el-button><el-button v-if="busy" @click="action(()=>call('tasks.cancel',{task_id:task!.id}))">取消任务</el-button></div>
-      </section><section class="panel tools"><h3>常用操作</h3><el-select v-model="operation"><el-option v-for="(label,value) in {append:'合并文件',join:'按字段关联',clean:'清理文本空格',compare:'对账差异',group:'分组求和',melt:'宽表转长表',pivot:'长表转矩阵 / BOM',template:'填写模板',recalculate:'Excel 原生重算副本'}" :key="value" :label="label" :value="value"/></el-select>
-        <p>关键字段 / 分组字段</p><el-select v-model="keys" multiple placeholder="先读取文件预览"><el-option v-for="col in fields" :key="col" :value="col"/></el-select>
-        <p>处理字段 / 数值字段</p><el-select v-model="columns" multiple><el-option v-for="col in fields" :key="col" :value="col"/></el-select>
-        <template v-if="operation==='pivot'"><p>转为列名的字段</p><el-select v-model="pivotColumn"><el-option v-for="col in fields" :key="col" :value="col"/></el-select><p>数量字段</p><el-select v-model="pivotValue"><el-option v-for="col in fields" :key="col" :value="col"/></el-select></template>
-        <template v-if="operation==='template'"><p>第二个文件为模板；目标工作表</p><el-input v-model="templateSheet"/><p>开始行</p><el-input-number v-model="templateStart" :min="1"/><div v-for="col in columns" :key="col"><p>{{col}} 写入列（如 A）</p><el-input v-model="templateMapping[col]"/></div></template>
-        <p class="muted">关联使用左连接，右表关键字段须唯一；单表操作使用当前选中文件。模板按导入顺序选取数据、模板。</p><el-button type="primary" :disabled="busy || !task.files.length || (operation==='recalculate' && !runtimeStatus.excel_ready)" @click="action(run)">按以上规则执行</el-button>
-      </section></div>
-      <section class="panel"><div class="section-title"><h3>3 · 结果与检查</h3><el-button :disabled="task.status!=='succeeded'" @click="action(saveRecipe)">保存为常用任务</el-button></div><el-alert v-if="task.error" :title="task.error" type="error" :closable="false"/>
-        <div v-for="file in task.outputs" :key="file.id" class="output"><strong>{{file.name}}</strong><pre>{{JSON.stringify(file.statistics,null,2)}}</pre><el-button @click="action(()=>call('files.open',{task_id:task!.id,file_id:file.id}))">用 Excel 打开</el-button><el-button @click="action(async()=>{activeFile=file.id;page=1;await loadPreview()})">预览结果</el-button><details v-if="file.issues?.length"><summary>检查事项</summary><pre>{{JSON.stringify(file.issues,null,2)}}</pre></details></div><p v-if="!task.outputs.length" class="muted">执行后将在这里展示结果。源文件保持不变。</p>
-      </section>
+    <main class="main-content">
+      <header class="task-header"><div><p class="eyebrow">EXCEL 工作台</p><h1>{{task?.files[0]?.name || '开始整理你的业务数据'}}</h1><p class="muted">{{busy ? '正在处理，请留意进度或待确认的问题' : task?.outputs.length ? '结果已保留，可以核对或继续处理' : '添加文件，选择处理方式，再核对结果'}}</p></div><el-tag v-if="task" :type="task.status==='failed'?'danger':busy?'warning':'success'">{{statusLabels[task.status]}}</el-tag></header>
+      <el-alert v-if="!runtime.ready" class="environment-hint" title="常用操作可直接使用；智能处理需要配置运行环境与模型。" type="info" :closable="true"><el-button link @click="openEnvironment">配置智能处理</el-button></el-alert>
+      <div v-if="startupError" class="panel"><el-alert :title="startupError" type="warning" :closable="false"/><el-button @click="openEnvironment">打开环境检测</el-button></div>
+      <div v-else-if="loading" class="panel empty">正在加载工作台…</div>
+      <template v-else-if="task">
+        <div class="workspace-tabs" role="tablist" aria-label="任务视图"><button role="tab" :aria-selected="view==='work'" :class="{active:view==='work'}" @click="action(()=>changeView('work'))">① 文件与处理</button><button v-if="workbookId" role="tab" :aria-selected="view==='editor'" :class="{active:view==='editor'}" @click="action(()=>changeView('editor'))">表格编辑器</button><button role="tab" :aria-selected="view==='result'" :class="{active:view==='result'}" @click="action(()=>changeView('result'))">② 结果与核对 <span v-if="task.outputs.length">{{task.outputs.length}}</span></button><el-button :disabled="busy" @click="action(()=>openBook())">＋ 空白工作簿</el-button></div>
+        <div v-if="books.length" class="workbook-chips"><span>任务工作簿</span><button v-for="b in books" :key="b.id" :class="{active:workbookId===b.id && view==='editor'}" :disabled="busy" @click="action(()=>openBook(b.id))">{{b.name}} · v{{b.revision}}</button></div>
+        <div v-if="view!=='result'" class="work-layout" :class="{'editor-layout':view==='editor'}">
+          <WorkbookEditor v-if="view==='editor' && workbookId" :key="`${task.id}-${workbookId}-${editorKey}`" ref="editor" :task-id="task.id" :workbook-id="workbookId" :revision="workbookRevision" :busy="busy" :auto-export="autoExport" @context="editorContext" @export-handled="autoExport=undefined" @view-version="(id:string,revision:number)=>action(()=>openBook(id,undefined,revision))" @extracted="(id:string)=>action(()=>openBook(id))" @saved="action(refreshBooks)"/>
+          <section v-else class="panel files-panel"><div class="section-title"><div><h2>输入文件 <small>{{task.files.length}} / 10</small></h2><p class="muted">支持 Excel 与 CSV，保留原文件副本</p></div><el-button :disabled="busy" @click="action(addFiles)">＋ 添加文件</el-button></div>
+            <div v-if="!task.files.length" class="empty file-empty"><span class="empty-icon">▦</span><strong>从一份业务表格开始</strong><p>库存、订单、ERP 导出表或输出模板</p><el-button type="primary" @click="action(addFiles)">选择 Excel / CSV</el-button></div>
+            <template v-else><div class="file-chips"><button v-for="f in task.files" :key="f.id" :class="{active:activeFile===f.id}" :disabled="busy" @click="activeFile=f.id">▦ {{f.name}}</button></div><el-button :disabled="busy" @click="action(()=>openBook(undefined,activeFile))">在表格编辑器中打开</el-button><p class="muted">超出 20 万有效单元格时继续使用下方分页预览与全量处理。</p><FilePreview :task-id="task.id" :file="file" :busy="busy" :initial="selections[activeFile]" @selection="s=>selections[s.file_id]=s" @columns="v=>fields=v" /></template>
+          </section>
+          <section class="panel processing-panel"><h2>处理方式</h2><div v-if="view==='editor' && workbookContext" class="input-context"><strong>{{workbookContext.sheet_name}}</strong><p>当前选区 {{workbookContext.address}} · 版本 {{workbookContext.version}}</p><el-radio-group v-model="inputScope" :disabled="busy" @change="editorContext(workbookContext)"><el-radio-button value="sheet">整张表数据</el-radio-button><el-radio-button value="range">选区数据</el-radio-button></el-radio-group><p class="muted">数据输入首行为表头；编辑要求将显示选区并生成待核对候选。</p></div><el-tabs v-model="mode"><el-tab-pane label="常用操作" name="tools"/><el-tab-pane label="用文字描述" name="agent"/></el-tabs>
+            <template v-if="mode==='tools'"><label class="field-label">想做什么？</label><el-select v-model="operation" aria-label="常用操作" :disabled="busy" @change="resetOperation"><el-option v-for="(label,key) in operations" :key="key" :value="key" :label="label"/></el-select>
+              <template v-if="twoFiles"><label class="field-label">{{operation==='template'?'数据文件':'主表 / 左表'}}</label><el-select v-model="left" aria-label="主表或数据文件" :disabled="busy" @change="activeFile=left"><el-option v-for="f in task.files" :key="f.id" :value="f.id" :label="f.name"/></el-select><label class="field-label">{{operation==='template'?'模板文件':'补充表 / 右表'}}</label><el-select v-model="right" aria-label="补充表或模板文件" :disabled="busy"><el-option v-for="f in task.files" :key="f.id" :value="f.id" :label="f.name"/></el-select></template>
+              <RuleFields v-if="newRule" :key="operation" ref="ruleFields" :kind="operation" :fields="fields.filter(c=>!c.startsWith('__source_'))" :busy="busy"/>
+              <p v-if="!newRule" class="operation-note">{{view==='editor' && !twoFiles?'使用当前工作簿所选输入范围。':operation==='append'?'合并全部已导入文件；可分别点击文件调整工作表与表头。':operation==='join'?'保留主表全部记录，按同名字段匹配；补充表的关联字段必须唯一。':operation==='template'?'明确选择数据与模板，写入模板副本。':twoFiles?'按同名关键字段对比两份表格。':'使用当前选中的文件与工作表。'}}</p>
+              <template v-if="usesKeys"><label class="field-label">{{['join','compare'].includes(operation)?'关联依据（同名字段）':'分组 / 保留字段'}}</label><el-select v-model="keys" multiple aria-label="关键字段" :disabled="busy" placeholder="从预览字段中选择"><el-option v-for="c in fields" :key="c" :value="c"/></el-select></template>
+              <template v-if="usesColumns"><label class="field-label">{{operation==='group'?'求和字段':operation==='compare'?'对比字段（留空比较共同字段）':'处理字段'}}</label><el-select v-model="columns" multiple aria-label="处理字段" :disabled="busy"><el-option v-for="c in fields" :key="c" :value="c"/></el-select></template>
+              <template v-if="operation==='pivot'"><label class="field-label">转成列名的字段</label><el-select v-model="pivotColumn" aria-label="列名字段" :disabled="busy"><el-option v-for="c in fields" :key="c" :value="c"/></el-select><label class="field-label">数量字段（重复项求和）</label><el-select v-model="pivotValue" aria-label="数量字段" :disabled="busy"><el-option v-for="c in fields" :key="c" :value="c"/></el-select></template>
+              <template v-if="operation==='template'"><label class="field-label">模板目标工作表（留空使用首表）</label><el-input v-model="templateSheet" aria-label="模板工作表" :disabled="busy"/><label class="field-label">开始写入行</label><el-input-number v-model="templateStart" :min="1" :disabled="busy"/><div v-for="c in columns" :key="c"><label class="field-label">{{c}} → Excel 列名</label><el-input v-model="mapping[c]" :aria-label="`${c}目标列`" placeholder="如 A" :disabled="busy"/></div></template>
+              <el-button type="primary" class="wide execute" :disabled="busy || (view==='editor' && workbookContext?.readonly) || (!task.files.length && operation!=='create_table' && view!=='editor') || (operation==='recalculate' && (!runtime.excel_ready || view==='editor'))" @click="action(execute)">{{task.status==='failed'?'按修改后的规则重试':'开始处理'}}</el-button><p v-if="operation==='recalculate' && !runtime.excel_ready" class="muted">Excel 原生重算不可用，请在设置中检测。</p>
+            </template>
+            <template v-else><p class="muted">例如：按物料汇总库存，再关联订单，列出未匹配记录。</p><el-alert v-if="!runtime.ready" title="请先在设置中配置智能处理；常用操作仍可使用。" type="info" :closable="false"/><div class="conversation"><div class="section-title"><el-button v-if="moreEvents" text @click="action(older)">更早的消息</el-button><el-button v-if="viewingOlder" text @click="action(latest)">返回最新消息</el-button></div><div v-for="event in displayedEvents" :key="event.id" class="message" :class="event.kind">{{message(event.data)}}</div></div>
+              <div v-if="question" class="question-box"><h3>需要你确认</h3><div v-for="(q,index) in question.questions" :key="index"><label class="field-label">{{q.question || q.title || q}}</label><el-select v-if="q.options?.length" v-model="answers[String(index)]" allow-create filterable default-first-option :aria-label="q.question || q.title"><el-option v-for="(o,i) in q.options" :key="i" :label="o.label || o" :value="o.value || o.label || o"/></el-select><el-input v-else v-model="answers[String(index)]" :aria-label="q.question || q.title || '业务规则'"/></div><el-button type="primary" class="execute" @click="action(()=>submitTask('tasks.answer',{answers}))">提交确认</el-button></div>
+              <div class="scenario-chips"><button :disabled="busy" @click="prompt='新建一张采购填报表，表头为编号、物料、数量、单价、备注，留出20行空白。'">新建填报表</button><button :disabled="busy" @click="prompt='新增金额列，按数量乘以单价计算，保留两位小数。'">计算金额</button><button :disabled="busy" @click="prompt='把当前选区的表头设为粗体、蓝色背景，其他内容保持原样。'">设置表头格式</button></div><el-input v-model="prompt" type="textarea" :rows="4" aria-label="处理要求" placeholder="描述你想得到的结果…" :disabled="busy"/><el-button type="primary" class="wide execute" :disabled="busy || (view==='editor' && workbookContext?.readonly) || !runtime.ready || !prompt.trim()" @click="action(ask)">发送处理要求</el-button>
+            </template>
+            <div v-if="busy" class="running-box" role="status"><strong>{{statusLabels[task.status]}}</strong><p>{{message([...events].reverse().find(e=>e.kind==='progress')?.data) || '任务已提交，请稍候'}}</p><el-button @click="action(()=>submitTask('tasks.cancel',{}))">取消任务</el-button></div><el-alert v-if="task.error" :title="task.error" type="error" :closable="false"/>
+          </section>
+        </div>
+        <ResultPanel v-else :key="task.id" :task="task" :busy="busy" @open-workbook="(id,exportNow,outputId)=>action(()=>openReviewed(id,exportNow,outputId))"><el-button :disabled="task.status!=='succeeded'" @click="action(saveRecipe)">保存为常用任务</el-button></ResultPanel>
+      </template>
     </main>
-    <main v-else><h1>工作环境需要检查</h1><el-alert :title="startupError || '正在加载工作台'" type="warning" :closable="false"/><el-button @click="environmentOpen=true">打开环境检测</el-button><p>修复依赖或数据目录后，请重新打开软件。</p></main>
-    <EnvironmentPanel v-model="environmentOpen" :busy="busy" @updated="action(refreshEnvironment)" />
-    <el-dialog v-model="settingsOpen" title="内网模型连接" width="520"><p>模型服务地址</p><el-input v-model="settings.base_url" placeholder="由客户 IT 提供的接口地址"/><p>实际 model 标识</p><el-input v-model="settings.model"/><p class="muted">认证密钥由部署人员通过 EXCEL_ASSISTANT_API_KEY 环境变量配置。模型未连接时仍可使用常用操作。</p><template #footer><el-button type="primary" @click="action(async()=>{await call('settings.save',{base_url:settings.base_url,model:settings.model});settingsOpen=false})">保存设置</el-button></template></el-dialog>
+    <EnvironmentPanel v-if="environmentLoaded" v-model="environmentOpen" :busy="busy" @updated="action(refreshEnvironment)" />
   </div>
 </template>

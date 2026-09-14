@@ -1,28 +1,63 @@
-# 本地验证记录
+# 整合版本本地验证记录
 
-更新日期：2026-09-14。环境：Windows 11、Python 3.13.5、Node 24.13.0、Qwen Code 0.23.3。
+更新日期：2026-09-14。Windows 11、Python 3.13.5、Node 24.13.0、Qwen Code 0.23.3、Univer 0.25.1。覆盖分页工作台与内置编辑器的统一版本。旧记录中的 41 项和 69 项测试属于更早阶段。
 
-| 检查 | 结果 |
+## 功能与协议
+
+| 检查 | 本次结果 |
 | --- | --- |
-| `python -m unittest discover -s tests -v` | 41 项本地通过，包含原业务基线以及环境发现、版本变化、明确 Node 路径、降级、取消、超时、报告与离线安装分支 |
-| 真实 Qwen CLI + Python SDK + 本地 HTTP 模型模拟服务 | 接口连接、会话记录、工具调用、MCP 输出生成通过；无工具产物时拒绝成功 |
-| 模型可见工具 | 未暴露 Shell、文件读取、子 Agent 和网络抓取工具 |
-| `npm run build --prefix gui` | TypeScript 检查和生产构建通过；存在前端主包体积提示 |
-| `pip check` | 无依赖冲突 |
-| 全新 Git 检出与独立虚拟环境（2026-09-12） | 从官方 PyPI 安装锁定依赖、重新执行两处 `npm ci`；当时 23 项测试和前端构建通过，未借用历史项目快照 |
-| 对应源码归档 | 未跟踪配置排除、已跟踪敏感文件拒绝、清单越界拒绝、无 Git 重建和无 WebView2 介质归档均通过 |
-| Windows 任务关闭竞争 | 首次云端验证发现监控线程仍持有 SQLite；已修复关闭时等待线程退出，新增回归测试在本地通过 |
-| 打包后的 `ExcelAssistant.exe --smoke` | WebView2 启动及页面脚本执行通过，退出码 0 |
-| `scripts/smoke_frozen_mcp.py` | 打包后的 MCP 通过真实 stdio 协议生成 Excel，正常退出 |
-| `scripts/smoke_frozen_environment.py` | 最终便携包组件加载、固定 Node 进程、真实 CLI 会话、MCP 输出、权限拒绝及取消均通过；显式补充动态 MCP 库打包声明 |
-| 随包 Node + Qwen CLI | 输出 0.23.3 |
-| WebView2 离线介质 | 已下载微软 x64 独立安装程序，签名 Valid，签发主体 Microsoft Corporation |
-| 环境界面与真实 PPX RPC | 本地浏览器验证发现已有 0.21.0、提示尚未验证、真实验证内置 0.23.3、保存选择及业务状态更新；无页面脚本错误，截图已脱敏 |
-| 指定 Node 与诊断 Agent | 真实 CLI 的会话、MCP 输出、权限拒绝、取消及实际 Node 进程路径均通过；仅使用临时合成数据 |
-| 依赖故障降级 | 阻断 pandas、openpyxl、SDK 导入后，环境与设置 RPC 仍可用；数据目录失败不阻断检测界面启动 |
-| WebView2 修复检查 | 在本机完成固定路径、SHA256 和缓存限定的微软签名校验；提权、取消和重复启动通过模拟测试；没有执行真实安装 |
-| 开发诊断脚本 | `scripts/doctor.py` 复用共享检查，输出脱敏结果，未配置 Agent 返回警告而不影响基础操作 |
+| 完整 unittest | 71 项通过（64.189 秒），包含并发初始化与导出复制失败回归 |
+| 真实 Qwen CLI + SDK + 本地模型模拟服务 | 完整回归设置 `REQUIRE_QWEN_CLI=1`，验证会话、工具、MCP 产物、权限、失败与取消；客户模型能力另行验收 |
+| 前端检查及生产构建 | TypeScript 与 Vite 构建通过；编辑器按需加载，约 5.90 MB，保留实际包体积提示 |
+| 工作台真实 RPC | 通过；千条任务、万条事件、300 列虚拟化、十万行翻页及终态停止轮询均已复测 |
+| 编辑闭环 | 中文输入、真实剪贴板、撤销重做、查找替换、自动保存、历史只读查看及公式错误恢复通过 |
+| 内核操作 | 字体、金额、百分比、合并、冻结、行列、工作表新增/改名/排序/删除、筛选、排序、填充、整列公共格式通过 |
+| 公式及格式往返 | 16 个约定函数与跨表绝对引用，共 17 个公式场景通过；日期纪元、序列 60、编号、样式及公式缓存由 unittest 覆盖 |
+| 整份核对 | 差异末页、整份采用、继续编辑和重开通过；已采用结果确认导出可达，取消不标记成功，切换视图不会重放已取消导出，继续编辑后旧确认被拦截 |
+| 生命周期及故障 | 旧工作簿/任务响应隔离、保存失败阻止切换、重试保留内容、导出取消通过；并发初始化和最终复制中途写盘失败新增回归 |
+| 反复打开与销毁编辑器 | 8 轮释放后显式 GC，JS heap 依次约 27、26、26、27、28、27、29、29 MB；未出现持续快速增长。此测量不等于 Windows 进程总内存 |
+| 真实 WebView2 | 隐藏 edgechromium 窗口、原生 PPX RPC、17 个公式、自动保存、本机 XLSX 导出通过；资源记录未发现外网请求 |
+| 容量与完整性 | 20 万有效单元格载入、末行修改、保存、导出及超限拦截通过；十万行计算和完整差异末页验证原始第 100001 行 |
 
-未完成：客户 Qwen 真实任务、Excel 2016 实机、干净客户终端安装、断外网出站审计、业务人员试用与生成 Python 的操作系统隔离。Excel COM 重算实现不计为 Excel 2016 已验收。
+测试使用独立的合成数据与任务目录。UI 脚本各自启动测试服务，结束后关闭服务和预览子进程；保留工作台与编辑器两组验证，未用新测试替换旧行为覆盖。
 
-验证策略：优先本地编译与测试；GitHub Actions 仅允许手动触发，执行前须获得用户明确要求。首次云端运行失败后未重跑，不将本地修复记录为云端通过。
+## Windows 便携包
+
+| 检查 | 本次结果 |
+| --- | --- |
+| 最终源码构建 | 通过；桌面与 MCP 重新收集构建，附签名验证的 WebView2 离线安装程序 |
+| 桌面 `--smoke` | 实际 `ExcelAssistant.exe` 启动 WebView2、完成页面脚本并正常退出，退出码 0 |
+| 打包后 MCP 与固定 CLI | 实际 `DataCraftMCP.exe` 通过真实 stdio 测试，覆盖新增计算、建表等操作；随包 Qwen Code 0.23.3 与固定 Node 协议验证通过 |
+| 打包后环境诊断 | 依赖探测与 Agent 探测均通过，覆盖实际 CLI 会话、产物、权限拒绝及取消 |
+| 打包后十万行预览 | 实际桌面可执行文件生成后台索引；首批 0.421 秒、缓存分页后端 P95 1.425 毫秒，编号及 NA 文本保持 |
+| 对应源码、前端、许可证与哈希 | `scripts/verify_release.py` 通过：3436 个交付文件、379 个源码文件、184 个运行依赖许可证、85 个前端资源；无遗漏或遗留前端文件，总体积约 669.8 MiB |
+
+## 复现与证据
+
+```powershell
+$env:REQUIRE_QWEN_CLI = '1'
+.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+npm run build --prefix gui
+.\.venv\Scripts\python.exe scripts/benchmark_workbench.py --skip-baseline
+.\.venv\Scripts\python.exe scripts/benchmark_workbook_editor.py
+node scripts/workbench_ui_smoke.cjs
+node scripts/workbook_engine_smoke.cjs
+$env:WORKBOOK_CAPACITY = '1'
+node scripts/workbook_ui_smoke.cjs
+node scripts/workbook_review_ui_smoke.cjs
+node scripts/workbook_lifecycle_ui_smoke.cjs
+.\.venv\Scripts\python.exe scripts/smoke_webview_workbook.py
+.\.venv\Scripts\python.exe scripts/build.py
+.\.venv\Scripts\python.exe scripts/smoke_frozen_mcp.py
+.\.venv\Scripts\python.exe scripts/smoke_frozen_environment.py
+.\.venv\Scripts\python.exe scripts/smoke_frozen_preview.py
+.\.venv\Scripts\python.exe scripts/verify_release.py
+```
+
+UI 测试需要本地 Playwright 与 Chrome，可通过 `PLAYWRIGHT_MODULE` 和 `CHROME_EXECUTABLE` 指定已有安装。截图与 JSON/日志保存在忽略的 `build/`，筛选后的合成数据界面图收录于 `docs/screenshots/`。测量口径与结果见 [性能记录](PERFORMANCE.md)。
+
+## 尚需外部验收
+
+客户 Qwen 真实业务、Excel 2016 实机打开与重算、客户样本人工对照、干净客户终端安装、Windows 原生 DPI、客户断外网出站审计和业务人员试用仍需客户环境完成。COM 重算实现与本地模拟模型测试不计为客户验收。生成 Python 继续关闭，操作系统隔离未验收。
+
+本轮仅运行本地验证。GitHub Actions 保持手动触发，未运行云端 CI；本地通过不记为云端通过。

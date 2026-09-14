@@ -1,6 +1,7 @@
 import json
 import re
 import uuid
+import time
 from pathlib import Path
 
 import pandas as pd
@@ -28,9 +29,38 @@ def overview(path):
 
 
 def read(store, task, selection: InputSelection):
-    path, info = store.resolve_file(task, selection.file_id)
     header = selection.header_row - 1
-    if path.suffix == ".csv":
+    row_offset = 0
+    if selection.workbook_id:
+        from .workbooks import Workbooks
+        rows, info = Workbooks(store).input(task, selection)
+        raw, sheet_name, row_offset = pd.DataFrame(rows), info['sheet'], info['row_offset']
+        path = None
+    else:
+        path, info = store.resolve_file(task, selection.file_id)
+    if path is None:
+        pass
+    elif info.get('kind') == 'workbook_candidate':
+        from .workbook_model import validate_snapshot
+        snapshot = json.loads(path.read_text(encoding='utf-8')); validate_snapshot(snapshot)
+        candidate = snapshot['sheets'][selection.sheet] if isinstance(selection.sheet, int) else next((s for s in snapshot['sheets'] if s['name']==selection.sheet), None)
+        if candidate is None:
+            raise ValueError('候选工作表不存在')
+        populated = [tuple(map(int,k.split(','))) for k,c in candidate['cells'].items() if c.get('value') is not None or c.get('formula')]
+        last_row = max((r for r,c in populated), default=0); last_column = max((c for r,c in populated), default=0)
+        if (last_row+1)*(last_column+1) > 2_000_000:
+            raise ValueError('候选数据分布范围过大，请采用后选择实际数据区域处理')
+        rows = []
+        for r in range(last_row+1):
+            row = []
+            for c in range(last_column+1):
+                value = candidate['cells'].get(f'{r},{c}', {})
+                if value.get('formula') and value.get('result_state') != 'ready':
+                    raise ValueError('候选包含尚未计算的公式，请采用后在编辑器中计算')
+                row.append('' if value.get('value') is None else value['value'])
+            rows.append(row)
+        raw, sheet_name, info = pd.DataFrame(rows), candidate['name'], {**info,'validated':False}
+    elif path.suffix == ".csv":
         try:
             raw = pd.read_csv(path, header=None, dtype=str, keep_default_na=False, encoding="utf-8-sig", skip_blank_lines=False)
         except UnicodeDecodeError:
@@ -72,12 +102,13 @@ def read(store, task, selection: InputSelection):
         raise ValueError("表头存在空白或重复列，请选择正确表头或整理源文件")
     if set(columns) & set(SOURCE) and not info.get("validated"):
         raise ValueError("输入包含系统保留的来源列")
-    frame = raw.iloc[header + 1:].copy().reset_index(drop=True)
+    frame = raw.iloc[header + 1:].copy()
+    frame.index = pd.RangeIndex(len(frame))
     frame.columns = columns
     if not info.get("validated"):
         frame[SOURCE[0]] = info["name"]
         frame[SOURCE[1]] = sheet_name
-        frame[SOURCE[2]] = range(selection.header_row + 1, selection.header_row + 1 + len(frame))
+        frame[SOURCE[2]] = range(row_offset + selection.header_row + 1, row_offset + selection.header_row + 1 + len(frame))
     return frame
 
 
@@ -94,17 +125,28 @@ def require_columns(frame, columns):
 
 
 def run_operation(store, task_id, operation):
+    started = time.perf_counter()
     op = Operation.model_validate(operation)
+    if op.kind in {'create_table', 'edit_workbook'}:
+        from .workbook_operations import run_workbook_operation
+        return run_workbook_operation(store, task_id, op)
     if op.kind == "recalculate":
         from .excel_com import recalculate
-        return recalculate(store, task_id, op.inputs[0].file_id)
+        info = recalculate(store, task_id, op.inputs[0].file_id)
+        from .workbook_results import register_file_result
+        register_file_result(store, task_id, op, info)
+        return info
     frames = [read(store, task_id, item) for item in (op.inputs[:1] if op.kind == "template" else op.inputs)]
+    read_finished = time.perf_counter()
     p = op.params
     data = frames[0]
     issues = []
     extras = {}
     config = {"schema_version": 1}
-    if op.kind == "append":
+    if op.kind in {'calculate', 'classify'}:
+        from .rules import transform
+        result, issues = transform(data, op.kind, p)
+    elif op.kind == "append":
         result = merge_dataframes(frames, parse_config(config)).data
     elif op.kind == "join":
         if len(frames) != 2:
@@ -123,7 +165,9 @@ def run_operation(store, task_id, operation):
     elif op.kind == "clean":
         config.update(p.get("config", {}))
         config["input"] = {**config.get("input", {}), "header_row": op.inputs[0].header_row}
-        _, source_info = store.resolve_file(task_id, op.inputs[0].file_id)
+        if op.inputs[0].workbook_id and len(data):
+            config['input']['header_row'] = int(data[SOURCE[2]].iloc[0]) - 1
+        source_info = {'name': str(data[SOURCE[0]].iloc[0]) if len(data) else '工作簿'} if op.inputs[0].workbook_id else store.resolve_file(task_id, op.inputs[0].file_id)[1]
         cleaned = clean_dataframe(data, parse_config(config), source_info["name"])
         result = cleaned.data
         issues = [i.to_dict() for i in cleaned.issues]
@@ -162,15 +206,24 @@ def run_operation(store, task_id, operation):
         result.columns = [str(c) for c in result.columns]
         extras["来源明细"] = data
     elif op.kind == "template":
-        return fill_template(store, task_id, op, frames[0])
+        info = fill_template(store, task_id, op, frames[0])
+        from .workbook_results import register_file_result
+        register_file_result(store, task_id, op, info)
+        return info
     else:
         raise ValueError("操作不支持")
     if issues:
         extras["问题明细"] = pd.DataFrame(issues)
-    return publish(store, task_id, result, extras, {"input_rows": [len(f) for f in frames], "output_rows": len(result), "issues": len(issues)}, issues)
+    stats = {"input_rows": [len(f) for f in frames], "output_rows": len(result), "issues": len(issues)}
+    stats['timings_ms'] = {'read': round((read_finished - started) * 1000), 'transform': round((time.perf_counter() - read_finished) * 1000)}
+    info = publish(store, task_id, result, extras, stats, issues)
+    from .workbook_results import register_result
+    register_result(store, task_id, op, frames, result, info)
+    return info
 
 
 def publish(store, task_id, frame, extras, stats, issues):
+    started = time.perf_counter()
     output_id = uuid.uuid4().hex
     folder = store.directory(task_id) / "outputs"
     folder.mkdir(exist_ok=True)
@@ -193,6 +246,7 @@ def publish(store, task_id, frame, extras, stats, issues):
     finally:
         temp.unlink(missing_ok=True)
     info = {"id": output_id, "name": "处理结果.xlsx", "relative": str(target.relative_to(store.directory(task_id))), "statistics": stats, "issues": issues[:200], "validated": True}
+    stats.setdefault('timings_ms', {})['export'] = round((time.perf_counter() - started) * 1000)
     task = store.get(task_id)
     task["outputs"].append(info)
     store.save(task)

@@ -80,10 +80,17 @@ class IntegrationTests(unittest.TestCase):
                         self.assertEqual(len(tools.tools),5)
                         result = await session.call_tool('datacraft_execute',{'operation':{'kind':'append','inputs':[{'file_id':file['id']}],'params':{}}})
                         self.assertFalse(result.isError)
+                        for operation in [
+                            {'kind':'create_table','inputs':[],'params':{'columns':['编号','数量']}},
+                            {'kind':'calculate','inputs':[{'file_id':file['id']}],'params':{'columns':[{'name':'金额','expression':{'op':'multiply','args':[{'field':'qty'},{'number':2}]}}]}},
+                        ]:
+                            result=await session.call_tool('datacraft_execute',{'operation':operation})
+                            self.assertFalse(result.isError,result)
+                        self.assertFalse(any(t.name.startswith(('outputs.','workbooks.')) for t in tools.tools))
                         rejected = await session.call_tool('datacraft_preview',{'selection':{'file_id':'../outside'}})
                         self.assertTrue(rejected.isError)
             asyncio.run(run())
-            self.assertEqual(len(store.get(task)['outputs']),1)
+            self.assertEqual(len(store.get(task)['outputs']),3)
 
     def test_spawned_job_and_recipe_without_model(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -123,7 +130,7 @@ class IntegrationTests(unittest.TestCase):
                         if name is None:
                             print('MISSING_EXECUTE_TOOLS',names,flush=True)
                             self.wfile.write(b'data: [DONE]\n\n');return
-                        args=json.dumps({'operation':{'kind':'append','inputs':[{'file_id':fixture['file_id']}],'params':{}}})
+                        args=json.dumps({'operation':fixture.get('operation') or {'kind':'append','inputs':[{'file_id':fixture['file_id']}],'params':{}}})
                         events=[{'id':'local-test','object':'chat.completion.chunk','choices':[{'index':0,'delta':{'role':'assistant','tool_calls':[{'index':0,'id':'fixture-call','type':'function','function':{'name':name,'arguments':args}}]},'finish_reason':None}]},{'id':'local-test','object':'chat.completion.chunk','choices':[{'index':0,'delta':{},'finish_reason':'tool_calls'}]}]
                     for event in events:self.wfile.write(('data: '+json.dumps(event)+'\n\n').encode())
                     self.wfile.write(b'data: [DONE]\n\n');self.wfile.flush()
@@ -148,6 +155,10 @@ class IntegrationTests(unittest.TestCase):
                 fixture.update(execute=True,file_id=store.import_file(task,source)['id'])
                 asyncio.run(asyncio.wait_for(AgentRunner(store,task,config).run('Execute the prepared fixture with datacraft_execute.'),90))
                 self.assertEqual(len(store.get(task)['outputs']),1)
+                task=store.create()['id']
+                fixture['operation']={'kind':'create_table','inputs':[],'params':{'columns':['编号','数量']}}
+                asyncio.run(asyncio.wait_for(AgentRunner(store,task,config).run('Create the empty table with datacraft_execute.'),90))
+                self.assertEqual(store.get(task)['outputs'][0]['kind'],'workbook_candidate')
                 names={t['function']['name'] for t in requests[-1].get('tools',[])}
                 self.assertFalse({'run_shell_command','read_file','agent','web_fetch'} & names)
         finally:

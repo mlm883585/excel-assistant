@@ -46,6 +46,24 @@ def package_media(root=None):
     if (root/'docs/ENVIRONMENT.md').is_file():
         shutil.copy2(root/'docs/ENVIRONMENT.md',destination/'ENVIRONMENT.md')
         updated.append(destination/'ENVIRONMENT.md')
+    for name in ['WORKBENCH.md', 'PERFORMANCE.md', 'WORKBOOK_EDITOR.md', 'VALIDATION.md']:
+        if (root/'docs'/name).is_file():
+            shutil.copy2(root/'docs'/name, destination/name)
+            updated.append(destination/name)
+    # Preserve relative README/documentation links without copying local snapshots.
+    public_docs = ['WORKBENCH.md', 'PERFORMANCE.md', 'WORKBOOK_EDITOR.md', 'VALIDATION.md',
+                   'ENVIRONMENT.md', 'OFFLINE_ACCEPTANCE.md', 'REPOSITORY_HYGIENE.md',
+                   'screenshots/workbench.png', 'screenshots/review.png', 'screenshots/editor.png']
+    for name in public_docs:
+        original = root / 'docs' / name
+        if original.is_file():
+            target = destination / 'docs' / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(original, target)
+            updated.append(target)
+    if (root/'vendor/licenses/gui').is_dir():
+        shutil.copytree(root/'vendor/licenses/gui', destination/'licenses/gui', dirs_exist_ok=True)
+        updated.extend(p for p in (destination/'licenses/gui').rglob('*') if p.is_file())
     source_archive=destination/'corresponding-source.zip'
     write_source_archive(root,source_archive)
     updated.append(source_archive)

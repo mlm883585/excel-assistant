@@ -1,6 +1,6 @@
 # 内网 Excel 数据助手
 
-基于 PPX V6、Qwen Code 和 DataCraft 的 Windows 桌面原型。支持多文件合并、关联、清洗、对账、汇总、宽长表/BOM 矩阵转换和简单模板填写。无需模型也可执行常用操作及保存的规则。
+基于 PPX V6、Vue 3、Univer、Qwen Code 和 DataCraft 的 Windows 本机 Excel 工作台。支持表格编辑、公式、格式与历史版本，以及多文件合并、关联、清洗、对账、汇总、计算列、条件分级、无文件建表和简单模板填写。无需模型也可编辑表格、执行常用操作及保存的规则。
 
 ## 开发启动
 
@@ -19,10 +19,10 @@ PPX Python 源码直接从 `vendor/ppx-py/src` 加载；无需额外安装 PPX�
 
 ## 使用
 
-1. 新建任务并添加文件，确认工作表和表头行，再读取预览。
+1. 新建任务并添加文件，确认工作表和表头行。可以使用分页预览，也可以打开内置编辑器；没有文件时可新建工作簿或填报表。
 2. 不接模型时，在常用操作中选择字段执行。关联和对账使用两个输入，模板填写按数据、模板顺序添加。
 3. 先在“环境检测”验证并选择 Qwen Code，再配置模型后描述要求；业务问题在界面回答。客户 IT 配置实际接口地址与 model 标识，密钥使用 `EXCEL_ASSISTANT_API_KEY` 环境变量。
-4. 检查结果与异常，使用 Excel 打开结果。成功任务可保存规则，下次按同一顺序添加替换文件。
+4. 在“结果与核对”查看完整差异和异常，整份采用后继续编辑，或确认后另存为 `.xlsx`。已有文件不会覆盖。成功任务可保存规则，下次按同一顺序添加替换文件；建表规则支持零文件输入。
 
 任务数据默认位于 `%LOCALAPPDATA%/ExcelAssistant`，可用 `EXCEL_ASSISTANT_HOME` 更改。导入文件会复制到任务目录；不会覆盖源文件。Agent 配置和会话与用户原有 Qwen Code 配置分开保存。
 
@@ -32,6 +32,7 @@ PPX Python 源码直接从 `vendor/ppx-py/src` 加载；无需额外安装 PPX�
 
 ```powershell
 .\.venv\Scripts\python.exe scripts/doctor.py
+$env:REQUIRE_QWEN_CLI = '1'
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 npm run build --prefix gui
 .\.venv\Scripts\python.exe scripts/build.py
@@ -48,9 +49,14 @@ npm run build --prefix gui
 - Qwen Code 0.23.3 + SDK 已接入；本机仅验证本地模型模拟服务，客户模型效果未验收。
 - 任意 Python 执行尚未开放：Windows 操作系统隔离未完成，Agent 当前只能调用注册的 DataCraft 工具。
 - 简单模板写入已实现；复杂 Excel 对象和 Excel 2016 实机兼容仍需验收。没有声称 openpyxl 能无损处理所有模板。
-- 公式缓存缺失时要求先在 Excel 中重算保存，避免输出错误数据。含宏工作簿暂不支持。
+- 文件数据处理要求有效公式缓存；内置编辑器可对支持范围内的公式本机重算后保存。错误或缺失结果不会替换成零。含宏工作簿暂不支持。
 - 规则支持原输入文件槽位替换；引用中间输出的 Agent 多步规则暂拒绝保存。
-- 表格预览分页传输，但底层仍读取工作表。十万行已覆盖，性能需以客户终端实测为准。
+- 分页预览使用后台流式索引与本地缓存；完整编辑器上限为 20 万有效单元格。超限仍支持全量数据处理与核对，性能分别记录。
 - 单实例单任务执行；半途失败保留已完成结果和错误记录，重新执行不会覆盖旧输出。
 
 许可证与第三方来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+## 使用与验收文档
+
+业务界面已按“文件与处理 / 结果与核对”组织，支持后台分页预览、常用操作、中文结果指标与按需环境设置。请参阅 [工作台使用说明](docs/WORKBENCH.md) 和 [本地性能记录](docs/PERFORMANCE.md)。
+
+已接入按需加载的 Univer 0.25.1 表格编辑器、本地工作簿版本和草稿恢复，以及计算列、条件分级、无文件建表、AI 区域编辑和整份差异核对。兼容范围、20 万有效单元格边界和导出流程见 [内置编辑器使用说明](docs/WORKBOOK_EDITOR.md)。最终整合验证以 [本地验证记录](docs/VALIDATION.md) 为准。

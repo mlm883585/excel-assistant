@@ -21,6 +21,10 @@ wheelhouse/
 htmlcov/
 *.egg-info/
 *.tsbuildinfo
+# Local implementation working notes; durable conclusions belong in docs/.
+/task_plan.md
+/findings.md
+/progress.md
 .idea/
 .vscode/
 .DS_Store

@@ -3,6 +3,7 @@ import multiprocessing
 import threading
 from pathlib import Path
 import json
+import uuid
 
 from .store import Store
 from .models import OperationPlan
@@ -21,10 +22,12 @@ def worker(root, task_id, plan, prompt, config):
                 store.event(task_id, "progress", f"正在执行第 {i + 1}/{len(validated.steps)} 步：{operation.kind}")
                 output = run_operation(store, task_id, operation.model_dump())
                 store.event(task_id, "output", output)
+        store.finish_reviews(task_id, True)
         record = store.get(task_id)
         record["status"] = "succeeded"
         store.save(record)
     except Exception as exc:
+        store.finish_reviews(task_id, False)
         record = store.get(task_id)
         record.update(status="failed", error=str(exc))
         store.save(record)
@@ -40,6 +43,7 @@ class Jobs:
         self.lock = threading.Lock()
         for task in store.list():
             if task["status"] in {"running", "waiting"}:
+                store.finish_reviews(task['id'], False)
                 task.update(status="failed", error="应用上次退出时任务中断，请重新执行")
                 store.save(task)
 
@@ -49,12 +53,19 @@ class Jobs:
         with self.lock:
             if self.closed:
                 raise ValueError("任务管理器已关闭")
+            # Reap handles only after observers finish using the Process objects.
+            if not any(w.is_alive() for w in self.watchers):
+                for old_id, old_process in list(self.processes.items()):
+                    if not old_process.is_alive():
+                        old_process.close()
+                        del self.processes[old_id]
             if any(p.is_alive() for p in self.processes.values()):
                 raise ValueError("首版一次执行一个任务，请等待或取消当前任务")
             record = self.store.get(task_id)
-            record.update(status="running", error=None)
+            record.update(status="running", error=None, run_id=uuid.uuid4().hex)
             if prompt is None:
                 record["plan"] = plan
+                record['editing_scope'] = None
             self.store.save(record)
             (self.store.directory(task_id) / "answer.json").unlink(missing_ok=True)
             process = multiprocessing.get_context("spawn").Process(target=worker, args=(str(self.store.root), task_id, plan, prompt, config or {}))
@@ -75,6 +86,7 @@ class Jobs:
             with self.lock:
                 record = self.store.get(task_id)
                 if record["status"] in {"running", "waiting"}:
+                    self.store.finish_reviews(task_id, False)
                     record.update(status="failed", error="工作进程异常退出")
                     self.store.save(record)
 
@@ -98,6 +110,7 @@ class Jobs:
             except psutil.NoSuchProcess:
                 pass
             process.join(5)
+            self.store.finish_reviews(task_id, False)
             marker = self.store.directory(task_id) / "excel-process.json"
             if marker.exists():
                 owner = json.loads(marker.read_text(encoding="utf-8"))

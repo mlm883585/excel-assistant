@@ -29,12 +29,21 @@ def create_server(root: Path, task: str):
     def datacraft_files() -> dict:
         """列出本任务导入文件及已生成文件的标识。仅能使用这些标识。"""
         record = store.get(task)
-        return {"inputs": record["files"], "outputs": record["outputs"]}
+        from .workbooks import Workbooks
+        service = Workbooks(store)
+        books = service.list(task)
+        for book in books:
+            book['sheets'] = [{'id': s['id'], 'name': s['name']} for s in service.load(task, book['id'])['snapshot']['sheets']]
+        return {"inputs": record["files"], "outputs": record["outputs"], 'workbooks': books}
 
     @server.tool()
     def datacraft_inspect(file_id: str) -> dict:
         """读取工作表目录；表头由用户确认，不猜测。"""
-        path, _ = store.resolve_file(task, file_id)
+        path, info = store.resolve_file(task, file_id)
+        if info.get('kind') == 'workbook_candidate':
+            import json
+            snapshot = json.loads(path.read_text(encoding='utf-8'))
+            return {'sheets':[s['name'] for s in snapshot['sheets']],'note':'待用户整份核对的工作簿候选；模型不能采用或导出'}
         return overview(path)
 
     @server.tool()
@@ -44,7 +53,11 @@ def create_server(root: Path, task: str):
 
     @server.tool()
     def datacraft_execute(operation: Operation) -> dict:
-        """执行确定性操作并校验导出。join params: keys/how/validate；group: keys/columns/aggregate；melt: keys/columns；pivot: keys/column/value/aggregate；clean: config(DataCraft schema_version=1)；template: sheet/start_row/mapping。业务歧义先询问用户。"""
+        """生成候选结果，不代替用户采用或导出。join: keys/how/validate；group: keys/columns/aggregate；melt: keys/columns；pivot: keys/column/value/aggregate；clean: config(schema_version=1)；template: sheet/start_row/mapping。
+        calculate params={columns:[{name:'金额',expression:{op:'multiply',args:[{field:'数量'},{field:'单价'}]}}]}，仅 add/subtract/multiply/divide/round/min/max/abs；round 第二参数为 {number:2}。
+        classify params={columns:[{name:'等级',rules:[{when:{field:'金额',operator:'ge',value:100},label:'高'}],default:'普通'}]}。条件允许 all/any 数组及 eq/ne/gt/ge/lt/le。
+        create_table inputs=[]，params={name,sheet_name,columns:['字段'],rows:[[null]],blank_rows:20}。只填用户明确提供的数据，缺失数字 null；用户明确要求示例才使用 example_data:true 并注明。
+        edit_workbook 需要工作簿输入（workbook_id/version/sheet_id/range），params={edits:[{kind:'set_values',range:{r0:1,c0:0,r1:1,c1:0},values:[[1]]}]}。范围零基含结束。还允许 set_style(style:font_name/font_size/bold/italic/font_color/bg_color/align/valign/text_wrap/num_format/borders)、add_sheet(name)、rename_sheet(name)。不可执行任意内核命令。所有业务歧义先询问；不得扩大用户选区。"""
         result = run_operation(store, task, operation.model_dump())
         record = store.get(task)
         plan = record.get("plan") or {"steps": [], "questions": []}
@@ -61,6 +74,9 @@ def create_server(root: Path, task: str):
         path, info = store.resolve_file(task, file_id)
         if not info.get("validated"):
             raise ValueError("此文件不是已登记的输出")
+        if info.get('kind') == 'workbook_candidate':
+            from .workbooks import Workbooks
+            return {'readable': True, 'candidate': True, 'review': Workbooks(store).review(task, file_id)}
         book = load_workbook(path, read_only=True)
         try:
             return {"readable": True, "sheets": book.sheetnames, "statistics": info.get("statistics", {})}

@@ -1,0 +1,2149 @@
+[
+  {
+    "name": "@babel/helper-string-parser",
+    "version": "7.29.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/babel/babel.git",
+      "directory": "packages/babel-helper-string-parser"
+    },
+    "files": [
+      "vendor/licenses/gui/@babel__helper-string-parser@7.29.7/LICENSE"
+    ]
+  },
+  {
+    "name": "@babel/helper-validator-identifier",
+    "version": "7.29.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/babel/babel.git",
+      "directory": "packages/babel-helper-validator-identifier"
+    },
+    "files": [
+      "vendor/licenses/gui/@babel__helper-validator-identifier@7.29.7/LICENSE"
+    ]
+  },
+  {
+    "name": "@babel/parser",
+    "version": "7.29.8",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/babel/babel.git",
+      "directory": "packages/babel-parser"
+    },
+    "files": [
+      "vendor/licenses/gui/@babel__parser@7.29.8/LICENSE"
+    ]
+  },
+  {
+    "name": "@babel/runtime",
+    "version": "7.29.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/babel/babel.git",
+      "directory": "packages/babel-runtime"
+    },
+    "files": [
+      "vendor/licenses/gui/@babel__runtime@7.29.7/LICENSE"
+    ]
+  },
+  {
+    "name": "@babel/types",
+    "version": "7.29.8",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/babel/babel.git",
+      "directory": "packages/babel-types"
+    },
+    "files": [
+      "vendor/licenses/gui/@babel__types@7.29.8/LICENSE"
+    ]
+  },
+  {
+    "name": "@ctrl/tinycolor",
+    "version": "4.2.1",
+    "license": "MIT",
+    "source": "scttcper/tinycolor",
+    "files": [
+      "vendor/licenses/gui/@ctrl__tinycolor@4.2.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@element-plus/icons-vue",
+    "version": "2.3.2",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/element-plus/element-plus-icons.git",
+      "directory": "packages/vue"
+    },
+    "files": [
+      "vendor/licenses/gui/@element-plus__icons-vue@2.3.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@flatten-js/interval-tree",
+    "version": "1.1.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/alexbol99/flatten-interval-tree.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@flatten-js__interval-tree@1.1.3/LICENSE"
+    ]
+  },
+  {
+    "name": "@floating-ui/core",
+    "version": "1.8.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/core"
+    },
+    "files": [
+      "vendor/licenses/gui/@floating-ui__core@1.8.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@floating-ui/dom",
+    "version": "1.8.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/dom"
+    },
+    "files": [
+      "vendor/licenses/gui/@floating-ui__dom@1.8.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@floating-ui/react-dom",
+    "version": "2.1.9",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/react-dom"
+    },
+    "files": [
+      "vendor/licenses/gui/@floating-ui__react-dom@2.1.9/LICENSE"
+    ]
+  },
+  {
+    "name": "@floating-ui/utils",
+    "version": "0.2.12",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/floating-ui/floating-ui.git",
+      "directory": "packages/utils"
+    },
+    "files": [
+      "vendor/licenses/gui/@floating-ui__utils@0.2.12/LICENSE"
+    ]
+  },
+  {
+    "name": "@grpc/grpc-js",
+    "version": "1.14.4",
+    "license": "Apache-2.0",
+    "source": "https://github.com/grpc/grpc-node/tree/master/packages/grpc-js",
+    "files": [
+      "vendor/licenses/gui/@grpc__grpc-js@1.14.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@grpc/proto-loader",
+    "version": "0.8.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/grpc/grpc-node.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@grpc__proto-loader@0.8.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@jridgewell/sourcemap-codec",
+    "version": "1.6.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/jridgewell/sourcemaps.git",
+      "directory": "packages/sourcemap-codec"
+    },
+    "files": [
+      "vendor/licenses/gui/@jridgewell__sourcemap-codec@1.6.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@js-sdsl/ordered-map",
+    "version": "4.4.2",
+    "license": "MIT",
+    "source": {
+      "type": "github",
+      "url": "https://github.com/js-sdsl/js-sdsl.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@js-sdsl__ordered-map@4.4.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@sxzz/popperjs-es",
+    "version": "2.11.8",
+    "license": "MIT",
+    "source": "github:popperjs/popper-core",
+    "files": [
+      "vendor/licenses/gui/@sxzz__popperjs-es@2.11.8/LICENSE.md"
+    ]
+  },
+  {
+    "name": "@protobufjs/aspromise",
+    "version": "1.1.2",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__aspromise@1.1.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/base64",
+    "version": "1.1.2",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__base64@1.1.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/codegen",
+    "version": "2.0.5",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__codegen@2.0.5/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/eventemitter",
+    "version": "1.1.1",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__eventemitter@1.1.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/fetch",
+    "version": "1.1.1",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__fetch@1.1.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/float",
+    "version": "1.0.2",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__float@1.0.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/path",
+    "version": "1.1.2",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__path@1.1.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/pool",
+    "version": "1.1.0",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__pool@1.1.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@protobufjs/utf8",
+    "version": "1.1.2",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/protobufjs/protobuf.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@protobufjs__utf8@1.1.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/primitive",
+    "version": "1.1.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/core/primitive"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__primitive@1.1.7/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-arrow",
+    "version": "1.1.15",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/arrow"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-arrow@1.1.15/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-collection",
+    "version": "1.1.15",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/collection"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-collection@1.1.15/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-compose-refs",
+    "version": "1.1.5",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/compose-refs"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-compose-refs@1.1.5/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-context",
+    "version": "1.2.2",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/context"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-context@1.2.2/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-dialog",
+    "version": "1.1.23",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/dialog"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-dialog@1.1.23/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-direction",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/direction"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-direction@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-dismissable-layer",
+    "version": "1.1.19",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/dismissable-layer"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-dismissable-layer@1.1.19/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-dropdown-menu",
+    "version": "2.1.24",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/dropdown-menu"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-dropdown-menu@2.1.24/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-focus-guards",
+    "version": "1.1.6",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/focus-guards"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-focus-guards@1.1.6/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-focus-scope",
+    "version": "1.1.16",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/focus-scope"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-focus-scope@1.1.16/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-hover-card",
+    "version": "1.1.23",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/hover-card"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-hover-card@1.1.23/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-id",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/id"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-id@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-menu",
+    "version": "2.1.24",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/menu"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-menu@2.1.24/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-popover",
+    "version": "1.1.23",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/popover"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-popover@1.1.23/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-popper",
+    "version": "1.3.7",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/popper"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-popper@1.3.7/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-portal",
+    "version": "1.1.17",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/portal"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-portal@1.1.17/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-presence",
+    "version": "1.1.10",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/presence"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-presence@1.1.10/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-primitive",
+    "version": "2.1.10",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/primitive"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-primitive@2.1.10/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-roving-focus",
+    "version": "1.1.19",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/roving-focus"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-roving-focus@1.1.19/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-separator",
+    "version": "1.1.15",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/separator"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-separator@1.1.15/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-slot",
+    "version": "1.3.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/slot"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-slot@1.3.3/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-callback-ref",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-callback-ref"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-callback-ref@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-controllable-state",
+    "version": "1.2.6",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-controllable-state"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-controllable-state@1.2.6/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-effect-event",
+    "version": "0.0.5",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-effect-event"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-effect-event@0.0.5/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-is-hydrated",
+    "version": "0.1.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-is-hydrated"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-is-hydrated@0.1.3/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-layout-effect",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-layout-effect"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-layout-effect@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-rect",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-rect"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-rect@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/react-use-size",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/react/use-size"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__react-use-size@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "@radix-ui/rect",
+    "version": "1.1.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/radix-ui/primitives.git",
+      "directory": "packages/core/rect"
+    },
+    "files": [
+      "vendor/licenses/gui/@radix-ui__rect@1.1.3/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/lodash",
+    "version": "4.17.25",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+      "directory": "types/lodash"
+    },
+    "files": [
+      "vendor/licenses/gui/@types__lodash@4.17.25/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/lodash-es",
+    "version": "4.17.12",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+      "directory": "types/lodash-es"
+    },
+    "files": [
+      "vendor/licenses/gui/@types__lodash-es@4.17.12/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/node",
+    "version": "26.5.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+      "directory": "types/node"
+    },
+    "files": [
+      "vendor/licenses/gui/@types__node@26.5.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@types/web-bluetooth",
+    "version": "0.0.21",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/DefinitelyTyped/DefinitelyTyped.git",
+      "directory": "types/web-bluetooth"
+    },
+    "files": [
+      "vendor/licenses/gui/@types__web-bluetooth@0.0.21/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/core",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__core@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "nanoid",
+    "version": "5.1.11",
+    "license": "MIT",
+    "source": "ai/nanoid",
+    "files": [
+      "vendor/licenses/gui/nanoid@5.1.11/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/design",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__design@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/docs",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__docs@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/docs-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__docs-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/drawing",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__drawing@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/engine-formula",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__engine-formula@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/engine-render",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__engine-render@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/find-replace",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__find-replace@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/icons",
+    "version": "1.4.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer-icons"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__icons@1.4.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/protocol",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__protocol@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/rpc",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__rpc@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-filter",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-filter@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-filter-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-filter-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-find-replace",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-find-replace@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-formula",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-formula@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-formula-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-formula-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-numfmt",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-numfmt@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-numfmt-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-numfmt-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-sort",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-sort@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-sort-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-sort-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/sheets-ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__sheets-ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/telemetry",
+    "version": "0.25.1",
+    "license": "见组件元数据",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__telemetry@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/themes",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__themes@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@univerjs/ui",
+    "version": "0.25.1",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dream-num/univer"
+    },
+    "files": [
+      "vendor/licenses/gui/@univerjs__ui@0.25.1/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/compiler-core",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/compiler-core"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__compiler-core@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/compiler-dom",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/compiler-dom"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__compiler-dom@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/compiler-sfc",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/compiler-sfc"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__compiler-sfc@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/compiler-ssr",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/compiler-ssr"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__compiler-ssr@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/reactivity",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/reactivity"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__reactivity@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/runtime-core",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/runtime-core"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__runtime-core@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/runtime-dom",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/runtime-dom"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__runtime-dom@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/server-renderer",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/server-renderer"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__server-renderer@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vue/shared",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git",
+      "directory": "packages/shared"
+    },
+    "files": [
+      "vendor/licenses/gui/@vue__shared@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "@vueuse/core",
+    "version": "14.4.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vueuse/vueuse.git",
+      "directory": "packages/core"
+    },
+    "files": [
+      "vendor/licenses/gui/@vueuse__core@14.4.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@vueuse/metadata",
+    "version": "14.4.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vueuse/vueuse.git",
+      "directory": "packages/metadata"
+    },
+    "files": [
+      "vendor/licenses/gui/@vueuse__metadata@14.4.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@vueuse/shared",
+    "version": "14.4.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vueuse/vueuse.git",
+      "directory": "packages/shared"
+    },
+    "files": [
+      "vendor/licenses/gui/@vueuse__shared@14.4.0/LICENSE"
+    ]
+  },
+  {
+    "name": "@wendellhu/redi",
+    "version": "1.1.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/wzhudev/redi.git"
+    },
+    "files": [
+      "vendor/licenses/gui/@wendellhu__redi@1.1.1/LICENSE"
+    ]
+  },
+  {
+    "name": "ansi-regex",
+    "version": "5.0.1",
+    "license": "MIT",
+    "source": "chalk/ansi-regex",
+    "files": [
+      "vendor/licenses/gui/ansi-regex@5.0.1/license"
+    ]
+  },
+  {
+    "name": "ansi-styles",
+    "version": "4.3.0",
+    "license": "MIT",
+    "source": "chalk/ansi-styles",
+    "files": [
+      "vendor/licenses/gui/ansi-styles@4.3.0/license"
+    ]
+  },
+  {
+    "name": "aria-hidden",
+    "version": "1.2.6",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/theKashey/aria-hidden.git"
+    },
+    "files": [
+      "vendor/licenses/gui/aria-hidden@1.2.6/LICENSE"
+    ]
+  },
+  {
+    "name": "async-lock",
+    "version": "1.4.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/rogierschouten/async-lock.git"
+    },
+    "files": [
+      "vendor/licenses/gui/async-lock@1.4.1/LICENSE"
+    ]
+  },
+  {
+    "name": "async-validator",
+    "version": "4.2.5",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git@github.com:yiminghe/async-validator.git"
+    },
+    "files": [
+      "vendor/licenses/gui/async-validator@4.2.5/LICENSE.md"
+    ]
+  },
+  {
+    "name": "cjk-regex",
+    "version": "3.4.2",
+    "license": "MIT",
+    "source": "https://github.com/ikatyang-collab/cjk-regex",
+    "files": [
+      "vendor/licenses/gui/cjk-regex@3.4.2/LICENSE"
+    ]
+  },
+  {
+    "name": "class-variance-authority",
+    "version": "0.7.1",
+    "license": "Apache-2.0",
+    "source": "https://github.com/joe-bell/cva.git",
+    "files": [
+      "vendor/licenses/gui/class-variance-authority@0.7.1/LICENSE"
+    ]
+  },
+  {
+    "name": "cliui",
+    "version": "8.0.1",
+    "license": "ISC",
+    "source": "yargs/cliui",
+    "files": [
+      "vendor/licenses/gui/cliui@8.0.1/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "clsx",
+    "version": "2.1.1",
+    "license": "MIT",
+    "source": "lukeed/clsx",
+    "files": [
+      "vendor/licenses/gui/clsx@2.1.1/license"
+    ]
+  },
+  {
+    "name": "collapse-white-space",
+    "version": "2.1.0",
+    "license": "MIT",
+    "source": "wooorm/collapse-white-space",
+    "files": [
+      "vendor/licenses/gui/collapse-white-space@2.1.0/license"
+    ]
+  },
+  {
+    "name": "color-convert",
+    "version": "2.0.1",
+    "license": "MIT",
+    "source": "Qix-/color-convert",
+    "files": [
+      "vendor/licenses/gui/color-convert@2.0.1/LICENSE"
+    ]
+  },
+  {
+    "name": "color-name",
+    "version": "1.1.4",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git@github.com:colorjs/color-name.git"
+    },
+    "files": [
+      "vendor/licenses/gui/color-name@1.1.4/LICENSE"
+    ]
+  },
+  {
+    "name": "csstype",
+    "version": "3.2.3",
+    "license": "MIT",
+    "source": "https://github.com/frenic/csstype",
+    "files": [
+      "vendor/licenses/gui/csstype@3.2.3/LICENSE"
+    ]
+  },
+  {
+    "name": "dayjs",
+    "version": "1.11.23",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/iamkun/dayjs.git"
+    },
+    "files": [
+      "vendor/licenses/gui/dayjs@1.11.23/LICENSE"
+    ]
+  },
+  {
+    "name": "decimal.js",
+    "version": "10.6.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/MikeMcl/decimal.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/decimal.js@10.6.0/LICENCE.md"
+    ]
+  },
+  {
+    "name": "detect-node-es",
+    "version": "1.1.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/thekashey/detect-node"
+    },
+    "files": [
+      "vendor/licenses/gui/detect-node-es@1.1.0/LICENSE"
+    ]
+  },
+  {
+    "name": "dom-helpers",
+    "version": "5.2.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/react-bootstrap/dom-helpers.git"
+    },
+    "files": [
+      "vendor/licenses/gui/dom-helpers@5.2.1/LICENSE"
+    ]
+  },
+  {
+    "name": "element-plus",
+    "version": "2.14.5",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/element-plus/element-plus.git"
+    },
+    "files": [
+      "vendor/licenses/gui/element-plus@2.14.5/LICENSE"
+    ]
+  },
+  {
+    "name": "emoji-regex",
+    "version": "8.0.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/mathiasbynens/emoji-regex.git"
+    },
+    "files": [
+      "vendor/licenses/gui/emoji-regex@8.0.0/LICENSE-MIT.txt"
+    ]
+  },
+  {
+    "name": "entities",
+    "version": "7.0.1",
+    "license": "BSD-2-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/fb55/entities.git"
+    },
+    "files": [
+      "vendor/licenses/gui/entities@7.0.1/LICENSE"
+    ]
+  },
+  {
+    "name": "escalade",
+    "version": "3.2.0",
+    "license": "MIT",
+    "source": "lukeed/escalade",
+    "files": [
+      "vendor/licenses/gui/escalade@3.2.0/license"
+    ]
+  },
+  {
+    "name": "estree-walker",
+    "version": "2.0.2",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/Rich-Harris/estree-walker"
+    },
+    "files": [
+      "vendor/licenses/gui/estree-walker@2.0.2/LICENSE"
+    ]
+  },
+  {
+    "name": "fast-diff",
+    "version": "1.3.0",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/jhchen/fast-diff"
+    },
+    "files": [
+      "vendor/licenses/gui/fast-diff@1.3.0/LICENSE"
+    ]
+  },
+  {
+    "name": "franc-min",
+    "version": "6.2.0",
+    "license": "MIT",
+    "source": "https://github.com/wooorm/franc/tree/main/packages/franc-min",
+    "files": [
+      "vendor/licenses/gui/franc-min@6.2.0/LICENSE-FROM-README.md",
+      "vendor/licenses/gui/franc-min@6.2.0/LICENSE-UPSTREAM.txt"
+    ]
+  },
+  {
+    "name": "get-caller-file",
+    "version": "2.0.5",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/stefanpenner/get-caller-file.git"
+    },
+    "files": [
+      "vendor/licenses/gui/get-caller-file@2.0.5/LICENSE.md"
+    ]
+  },
+  {
+    "name": "get-nonce",
+    "version": "1.0.1",
+    "license": "MIT",
+    "source": "git@github.com:theKashey/get-nonce.git",
+    "files": [
+      "vendor/licenses/gui/get-nonce@1.0.1/LICENSE"
+    ]
+  },
+  {
+    "name": "immediate",
+    "version": "3.0.6",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/calvinmetcalf/immediate.git"
+    },
+    "files": [
+      "vendor/licenses/gui/immediate@3.0.6/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "is-fullwidth-code-point",
+    "version": "3.0.0",
+    "license": "MIT",
+    "source": "sindresorhus/is-fullwidth-code-point",
+    "files": [
+      "vendor/licenses/gui/is-fullwidth-code-point@3.0.0/license"
+    ]
+  },
+  {
+    "name": "js-tokens",
+    "version": "4.0.0",
+    "license": "MIT",
+    "source": "lydell/js-tokens",
+    "files": [
+      "vendor/licenses/gui/js-tokens@4.0.0/LICENSE"
+    ]
+  },
+  {
+    "name": "kdbush",
+    "version": "4.1.0",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/mourner/kdbush.git"
+    },
+    "files": [
+      "vendor/licenses/gui/kdbush@4.1.0/LICENSE"
+    ]
+  },
+  {
+    "name": "lie",
+    "version": "3.1.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/calvinmetcalf/lie.git"
+    },
+    "files": [
+      "vendor/licenses/gui/lie@3.1.1/license.md"
+    ]
+  },
+  {
+    "name": "localforage",
+    "version": "1.10.0",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/localForage/localForage.git"
+    },
+    "files": [
+      "vendor/licenses/gui/localforage@1.10.0/LICENSE"
+    ]
+  },
+  {
+    "name": "lodash",
+    "version": "4.18.1",
+    "license": "MIT",
+    "source": "lodash/lodash",
+    "files": [
+      "vendor/licenses/gui/lodash@4.18.1/LICENSE"
+    ]
+  },
+  {
+    "name": "lodash-es",
+    "version": "4.18.1",
+    "license": "MIT",
+    "source": "lodash/lodash",
+    "files": [
+      "vendor/licenses/gui/lodash-es@4.18.1/LICENSE"
+    ]
+  },
+  {
+    "name": "lodash-unified",
+    "version": "1.0.3",
+    "license": "MIT",
+    "source": "https://registry.npmmirror.com/lodash-unified/-/lodash-unified-1.0.3.tgz",
+    "files": [
+      "vendor/licenses/gui/lodash-unified@1.0.3/LICENSE-UPSTREAM.txt"
+    ]
+  },
+  {
+    "name": "lodash.camelcase",
+    "version": "4.3.0",
+    "license": "MIT",
+    "source": "lodash/lodash",
+    "files": [
+      "vendor/licenses/gui/lodash.camelcase@4.3.0/LICENSE"
+    ]
+  },
+  {
+    "name": "long",
+    "version": "5.3.2",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcodeIO/long.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/long@5.3.2/LICENSE"
+    ]
+  },
+  {
+    "name": "loose-envify",
+    "version": "1.4.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/zertosh/loose-envify.git"
+    },
+    "files": [
+      "vendor/licenses/gui/loose-envify@1.4.0/LICENSE"
+    ]
+  },
+  {
+    "name": "magic-string",
+    "version": "0.30.21",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/Rich-Harris/magic-string.git"
+    },
+    "files": [
+      "vendor/licenses/gui/magic-string@0.30.21/LICENSE"
+    ]
+  },
+  {
+    "name": "memoize-one",
+    "version": "6.0.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/alexreardon/memoize-one.git"
+    },
+    "files": [
+      "vendor/licenses/gui/memoize-one@6.0.0/LICENSE"
+    ]
+  },
+  {
+    "name": "n-gram",
+    "version": "2.0.2",
+    "license": "MIT",
+    "source": "words/n-gram",
+    "files": [
+      "vendor/licenses/gui/n-gram@2.0.2/license"
+    ]
+  },
+  {
+    "name": "nanoid",
+    "version": "3.3.19",
+    "license": "MIT",
+    "source": "ai/nanoid",
+    "files": [
+      "vendor/licenses/gui/nanoid@3.3.19/LICENSE"
+    ]
+  },
+  {
+    "name": "normalize-wheel-es",
+    "version": "1.2.0",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/sxzz/normalize-wheel-es.git"
+    },
+    "files": [
+      "vendor/licenses/gui/normalize-wheel-es@1.2.0/LICENSE"
+    ]
+  },
+  {
+    "name": "numfmt",
+    "version": "3.2.6",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/borgar/numfmt.git"
+    },
+    "files": [
+      "vendor/licenses/gui/numfmt@3.2.6/LICENSE"
+    ]
+  },
+  {
+    "name": "object-assign",
+    "version": "4.1.1",
+    "license": "MIT",
+    "source": "sindresorhus/object-assign",
+    "files": [
+      "vendor/licenses/gui/object-assign@4.1.1/license"
+    ]
+  },
+  {
+    "name": "opentype.js",
+    "version": "2.0.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/opentypejs/opentype.js.git"
+    },
+    "files": [
+      "vendor/licenses/gui/opentype.js@2.0.0/LICENSE"
+    ]
+  },
+  {
+    "name": "ot-json1",
+    "version": "1.0.2",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/josephg/json1.git"
+    },
+    "files": [
+      "vendor/licenses/gui/ot-json1@1.0.2/LICENSE-FROM-README.md"
+    ]
+  },
+  {
+    "name": "ot-text-unicode",
+    "version": "4.0.0",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/ottypes/text.git"
+    },
+    "files": [
+      "vendor/licenses/gui/ot-text-unicode@4.0.0/LICENSE-FROM-README.md"
+    ]
+  },
+  {
+    "name": "picocolors",
+    "version": "1.1.1",
+    "license": "ISC",
+    "source": "alexeyraspopov/picocolors",
+    "files": [
+      "vendor/licenses/gui/picocolors@1.1.1/LICENSE"
+    ]
+  },
+  {
+    "name": "postcss",
+    "version": "8.5.28",
+    "license": "MIT",
+    "source": "postcss/postcss",
+    "files": [
+      "vendor/licenses/gui/postcss@8.5.28/LICENSE"
+    ]
+  },
+  {
+    "name": "ppx-js",
+    "version": "6.0.0",
+    "license": "AGPL-3.0-only",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/pangao1990/PPX.git",
+      "directory": "ppx/packages/ppx-js"
+    },
+    "files": [
+      "vendor/licenses/gui/ppx-js@6.0.0/LICENSE"
+    ]
+  },
+  {
+    "name": "prop-types",
+    "version": "15.8.1",
+    "license": "MIT",
+    "source": "facebook/prop-types",
+    "files": [
+      "vendor/licenses/gui/prop-types@15.8.1/LICENSE"
+    ]
+  },
+  {
+    "name": "protobufjs",
+    "version": "7.6.6",
+    "license": "BSD-3-Clause",
+    "source": "protobufjs/protobuf.js",
+    "files": [
+      "vendor/licenses/gui/protobufjs@7.6.6/LICENSE"
+    ]
+  },
+  {
+    "name": "quickselect",
+    "version": "3.0.0",
+    "license": "ISC",
+    "source": "github:mourner/quickselect",
+    "files": [
+      "vendor/licenses/gui/quickselect@3.0.0/LICENSE"
+    ]
+  },
+  {
+    "name": "rbush",
+    "version": "4.0.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/mourner/rbush.git"
+    },
+    "files": [
+      "vendor/licenses/gui/rbush@4.0.1/LICENSE"
+    ]
+  },
+  {
+    "name": "react",
+    "version": "18.3.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/facebook/react.git",
+      "directory": "packages/react"
+    },
+    "files": [
+      "vendor/licenses/gui/react@18.3.1/LICENSE"
+    ]
+  },
+  {
+    "name": "react-dom",
+    "version": "18.3.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/facebook/react.git",
+      "directory": "packages/react-dom"
+    },
+    "files": [
+      "vendor/licenses/gui/react-dom@18.3.1/LICENSE"
+    ]
+  },
+  {
+    "name": "react-is",
+    "version": "16.13.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/facebook/react.git",
+      "directory": "packages/react-is"
+    },
+    "files": [
+      "vendor/licenses/gui/react-is@16.13.1/LICENSE"
+    ]
+  },
+  {
+    "name": "react-remove-scroll",
+    "version": "2.7.2",
+    "license": "MIT",
+    "source": "https://github.com/theKashey/react-remove-scroll",
+    "files": [
+      "vendor/licenses/gui/react-remove-scroll@2.7.2/LICENSE"
+    ]
+  },
+  {
+    "name": "react-remove-scroll-bar",
+    "version": "2.3.8",
+    "license": "MIT",
+    "source": "https://github.com/theKashey/react-remove-scroll-bar",
+    "files": [
+      "vendor/licenses/gui/react-remove-scroll-bar@2.3.8/LICENSE-FROM-README.md",
+      "vendor/licenses/gui/react-remove-scroll-bar@2.3.8/LICENSE-UPSTREAM.txt"
+    ]
+  },
+  {
+    "name": "react-style-singleton",
+    "version": "2.2.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/theKashey/react-style-singleton"
+    },
+    "files": [
+      "vendor/licenses/gui/react-style-singleton@2.2.3/LICENSE"
+    ]
+  },
+  {
+    "name": "react-transition-group",
+    "version": "4.4.5",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/reactjs/react-transition-group.git"
+    },
+    "files": [
+      "vendor/licenses/gui/react-transition-group@4.4.5/LICENSE"
+    ]
+  },
+  {
+    "name": "regexp-util",
+    "version": "2.0.3",
+    "license": "MIT",
+    "source": "https://github.com/ikatyang-collab/regexp-util",
+    "files": [
+      "vendor/licenses/gui/regexp-util@2.0.3/LICENSE"
+    ]
+  },
+  {
+    "name": "require-directory",
+    "version": "2.1.1",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git://github.com/troygoode/node-require-directory.git"
+    },
+    "files": [
+      "vendor/licenses/gui/require-directory@2.1.1/LICENSE"
+    ]
+  },
+  {
+    "name": "rxjs",
+    "version": "7.8.2",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/reactivex/rxjs.git"
+    },
+    "files": [
+      "vendor/licenses/gui/rxjs@7.8.2/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "scheduler",
+    "version": "0.23.2",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/facebook/react.git",
+      "directory": "packages/scheduler"
+    },
+    "files": [
+      "vendor/licenses/gui/scheduler@0.23.2/LICENSE"
+    ]
+  },
+  {
+    "name": "sonner",
+    "version": "2.0.8",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/emilkowalski/sonner.git"
+    },
+    "files": [
+      "vendor/licenses/gui/sonner@2.0.8/LICENSE.md"
+    ]
+  },
+  {
+    "name": "source-map-js",
+    "version": "1.2.1",
+    "license": "BSD-3-Clause",
+    "source": "7rulnik/source-map-js",
+    "files": [
+      "vendor/licenses/gui/source-map-js@1.2.1/LICENSE"
+    ]
+  },
+  {
+    "name": "string-width",
+    "version": "4.2.3",
+    "license": "MIT",
+    "source": "sindresorhus/string-width",
+    "files": [
+      "vendor/licenses/gui/string-width@4.2.3/license"
+    ]
+  },
+  {
+    "name": "strip-ansi",
+    "version": "6.0.1",
+    "license": "MIT",
+    "source": "chalk/strip-ansi",
+    "files": [
+      "vendor/licenses/gui/strip-ansi@6.0.1/license"
+    ]
+  },
+  {
+    "name": "tailwind-merge",
+    "version": "2.6.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/dcastil/tailwind-merge.git"
+    },
+    "files": [
+      "vendor/licenses/gui/tailwind-merge@2.6.0/LICENSE.md"
+    ]
+  },
+  {
+    "name": "trigram-utils",
+    "version": "2.0.1",
+    "license": "MIT",
+    "source": "wooorm/trigram-utils",
+    "files": [
+      "vendor/licenses/gui/trigram-utils@2.0.1/license"
+    ]
+  },
+  {
+    "name": "tslib",
+    "version": "2.8.1",
+    "license": "0BSD",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/Microsoft/tslib.git"
+    },
+    "files": [
+      "vendor/licenses/gui/tslib@2.8.1/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "typescript",
+    "version": "5.9.3",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/microsoft/TypeScript.git"
+    },
+    "files": [
+      "vendor/licenses/gui/typescript@5.9.3/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "undici-types",
+    "version": "8.9.0",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/nodejs/undici.git"
+    },
+    "files": [
+      "vendor/licenses/gui/undici-types@8.9.0/LICENSE"
+    ]
+  },
+  {
+    "name": "unicode-regex",
+    "version": "4.2.3",
+    "license": "MIT",
+    "source": "https://github.com/ikatyang-collab/unicode-regex",
+    "files": [
+      "vendor/licenses/gui/unicode-regex@4.2.3/LICENSE"
+    ]
+  },
+  {
+    "name": "unicount",
+    "version": "1.1.0",
+    "license": "ISC",
+    "source": "https://github.com/josephg/unicount",
+    "files": [
+      "vendor/licenses/gui/unicount@1.1.0/LICENSE-FROM-README.md"
+    ]
+  },
+  {
+    "name": "use-callback-ref",
+    "version": "1.3.3",
+    "license": "MIT",
+    "source": "https://github.com/theKashey/use-callback-ref/",
+    "files": [
+      "vendor/licenses/gui/use-callback-ref@1.3.3/LICENSE"
+    ]
+  },
+  {
+    "name": "use-sidecar",
+    "version": "1.1.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/theKashey/use-sidecar"
+    },
+    "files": [
+      "vendor/licenses/gui/use-sidecar@1.1.3/LICENSE"
+    ]
+  },
+  {
+    "name": "vue",
+    "version": "3.5.42",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/vuejs/core.git"
+    },
+    "files": [
+      "vendor/licenses/gui/vue@3.5.42/LICENSE"
+    ]
+  },
+  {
+    "name": "vue-component-type-helpers",
+    "version": "3.3.11",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/vuejs/language-tools.git",
+      "directory": "packages/component-type-helpers"
+    },
+    "files": [
+      "vendor/licenses/gui/vue-component-type-helpers@3.3.11/LICENSE"
+    ]
+  },
+  {
+    "name": "wrap-ansi",
+    "version": "7.0.0",
+    "license": "MIT",
+    "source": "chalk/wrap-ansi",
+    "files": [
+      "vendor/licenses/gui/wrap-ansi@7.0.0/license"
+    ]
+  },
+  {
+    "name": "y18n",
+    "version": "5.0.8",
+    "license": "ISC",
+    "source": "yargs/y18n",
+    "files": [
+      "vendor/licenses/gui/y18n@5.0.8/LICENSE"
+    ]
+  },
+  {
+    "name": "yargs",
+    "version": "17.7.3",
+    "license": "MIT",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/yargs/yargs.git"
+    },
+    "files": [
+      "vendor/licenses/gui/yargs@17.7.3/LICENSE"
+    ]
+  },
+  {
+    "name": "yargs-parser",
+    "version": "21.1.1",
+    "license": "ISC",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/yargs/yargs-parser.git"
+    },
+    "files": [
+      "vendor/licenses/gui/yargs-parser@21.1.1/LICENSE.txt"
+    ]
+  }
+]

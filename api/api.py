@@ -11,6 +11,7 @@ _store = None
 _jobs = None
 _lock = threading.RLock()
 _environment = None
+_previews = None
 
 
 def services():
@@ -53,6 +54,48 @@ def list_tasks():
 def get_task(task_id: str, after: int = 0):
     store, _ = services()
     return {"task": store.get(task_id), "events": store.events(task_id, after)}
+
+
+@api_method('tasks.summaries')
+@guarded
+def task_summaries(offset: int = 0, limit: int = 30):
+    return services()[0].summaries(offset, limit)
+
+
+@api_method('tasks.events')
+@guarded
+def task_events(task_id: str, before: int | None = None, limit: int = 200):
+    return services()[0].event_page(task_id, before, limit)
+
+
+def previews():
+    global _previews
+    with _lock:
+        if _previews is None:
+            from assistant.preview import PreviewService
+            _previews = PreviewService(services()[0])
+        return _previews
+
+
+@api_method('files.preview_start')
+@guarded
+def preview_start(task_id: str, selection: dict):
+    with _lock:
+        if _jobs and any(p.is_alive() for p in _jobs.processes.values()):
+            return {'state': 'busy', 'retry_after_ms': 500}
+        return previews().start(task_id, selection)
+
+
+@api_method('files.preview_page')
+@guarded
+def preview_page(preview_id: str, offset: int = 0, limit: int = 50):
+    return previews().page(preview_id, offset, limit)
+
+
+@api_method('files.preview_cancel')
+@guarded
+def preview_cancel(preview_id: str | None = None):
+    return previews().cancel(preview_id)
 
 
 @api_method("files.choose")
@@ -124,7 +167,7 @@ def settings_save(base_url: str, model: str):
 
 @api_method("tasks.agent")
 @guarded
-def agent(task_id: str, prompt: str, selections: list[dict]):
+def agent(task_id: str, prompt: str, selections: list[dict], editing_selection: dict | None = None):
     if not prompt.strip() or len(prompt) > 20000:
         raise ValueError("请输入有效任务要求")
     from assistant.models import InputSelection
@@ -132,12 +175,28 @@ def agent(task_id: str, prompt: str, selections: list[dict]):
     store, jobs = services()
     for item in selections:
         selection = InputSelection.model_validate(item)
-        store.resolve_file(task_id, selection.file_id)
+        if selection.workbook_id:
+            from assistant.workbooks import Workbooks
+            Workbooks(store).input(task_id, selection)
+        else:
+            store.resolve_file(task_id, selection.file_id)
     with _lock:
         check_execution()
         selected = environment().runtime.selected()
         config = {**settings_get(), 'cli': selected['cli'], 'node_executable': selected['node_executable'], 'runtime_fingerprint': selected['fingerprint']}
         AgentRunner(store, task_id, config).options()
+        scope = None
+        if editing_selection:
+            scope = InputSelection.model_validate(editing_selection)
+            if not scope.workbook_id or not scope.range:
+                raise ValueError('区域编辑须提供明确的工作簿选区')
+            from assistant.workbooks import Workbooks
+            record = Workbooks(store).load(task_id, scope.workbook_id, scope.version)
+            if record['current_revision'] != scope.version or record['readonly']:
+                raise ValueError('当前编辑选区已过期或只读')
+        record = store.get(task_id)
+        record['editing_scope'] = scope.model_dump(exclude_none=True) if scope else None
+        store.save(record)
         request = prompt + "\n用户选定的输入与表头：" + json.dumps(selections, ensure_ascii=False)
         store.event(task_id, "user", prompt)
         return jobs.start(task_id, prompt=request, config=config)
@@ -199,6 +258,8 @@ def environment():
 def check_execution(plan=None):
     from assistant.diagnostics import require_storage, excel_installed
     require_storage()
+    if _previews:
+        _previews.cancel()
     service = environment()
     if service.installing:
         raise ValueError('环境安装进行中，请完成后再执行任务')
@@ -312,7 +373,118 @@ def diagnostics_install():
 
 
 def shutdown():
+    if _previews:
+        _previews.close()
     if _environment:
         _environment.close()
     if _jobs:
         _jobs.close()
+
+
+def workbooks():
+    from assistant.workbooks import Workbooks
+    return Workbooks(services()[0])
+
+
+@api_method('workbooks.list')
+@guarded
+def workbook_list(task_id: str):
+    return workbooks().list(task_id)
+
+
+@api_method('workbooks.open')
+@guarded
+def workbook_open(task_id: str, workbook_id: str | None = None, file_id: str | None = None, pure_data: bool = False, revision: int | None = None):
+    with _lock:
+        return workbooks().open(task_id, workbook_id, file_id, pure_data, revision)
+
+
+@api_method('workbooks.save')
+@guarded
+def workbook_save(task_id: str, snapshot: dict, expected_version: int):
+    with _lock:
+        return workbooks().save(task_id, snapshot, expected_version)
+
+
+@api_method('workbooks.versions')
+@guarded
+def workbook_versions(task_id: str, workbook_id: str, offset: int = 0, limit: int = 50):
+    return workbooks().versions(task_id, workbook_id, offset, limit)
+
+
+@api_method('workbooks.restore')
+@guarded
+def workbook_restore(task_id: str, workbook_id: str, revision: int, expected_version: int):
+    with _lock:
+        return workbooks().restore(task_id, workbook_id, revision, expected_version)
+
+
+@api_method('outputs.review')
+@guarded
+def output_review(task_id: str, output_id: str):
+    return workbooks().review(task_id, output_id)
+
+
+@api_method('outputs.changes')
+@guarded
+def output_changes(task_id: str, output_id: str, offset: int = 0, limit: int = 50):
+    return workbooks().changes(task_id, output_id, offset, limit)
+
+
+@api_method('outputs.apply')
+@guarded
+def output_apply(task_id: str, output_id: str):
+    with _lock:
+        ensure_idle()
+        return workbooks().apply(task_id, output_id)
+
+
+@api_method('outputs.export')
+@guarded
+def output_export(task_id: str, workbook_id: str | None = None, expected_version: int | None = None, output_id: str | None = None):
+    import webview
+    with _lock:
+        ensure_idle()
+        service = workbooks()
+        service.idle(task_id)
+        if workbook_id:
+            record = service.load(task_id, workbook_id, expected_version)
+            if expected_version != record['current_revision'] or record['readonly']:
+                raise ValueError('请先保存并重新核对当前工作簿版本')
+            name = record['snapshot']['name'].removesuffix('.xlsx') + '.xlsx'
+        elif output_id:
+            review = service.review(task_id, output_id)
+            if review.get('can_edit') or review.get('legacy'):
+                raise ValueError('请先采用候选并在编辑器完成公式计算后导出；旧结果可用 Excel 打开')
+            if review.get('state') != 'ready':
+                raise ValueError('此候选所属执行尚未成功或已取消')
+            if review.get('requires_excel_recalculation'):
+                raise ValueError('此文件含编辑器未支持的对象且公式需要重算，请使用 Excel 原生重算副本后核对')
+            if services()[0].get(task_id)['status'] in {'failed', 'cancelled'}:
+                raise ValueError('任务失败或取消，请重新生成完整结果')
+            source, _ = services()[0].resolve_file(task_id, output_id)
+            name = '核对结果.xlsx'
+        else:
+            raise ValueError('请选择明确的导出版本')
+        paths = webview.windows[0].create_file_dialog(webview.SAVE_DIALOG, save_filename=name, file_types=('Excel (*.xlsx)',))
+        if not paths:
+            return {'exported': False, 'cancelled': True}
+        target = Path(paths if isinstance(paths, str) else paths[0])
+        if workbook_id:
+            return service.export(task_id, workbook_id, expected_version, target, output_id)
+        if target.suffix.lower() != '.xlsx' or target.exists():
+            raise ValueError('请使用新的 .xlsx 文件名另存')
+        import shutil
+        created = False
+        try:
+            with source.open('rb') as src, target.open('xb') as dst:
+                created = True
+                shutil.copyfileobj(src, dst)
+                dst.flush(); os.fsync(dst.fileno())
+            with services()[0].connect() as db:
+                db.execute('UPDATE output_reviews SET exported_revision=1 WHERE task=? AND id=?', (task_id, output_id))
+        except BaseException:
+            if created:
+                target.unlink(missing_ok=True)
+            raise
+        return {'exported': True, 'name': target.name}
