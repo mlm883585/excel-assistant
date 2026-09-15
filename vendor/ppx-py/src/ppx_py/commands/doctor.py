@@ -80,11 +80,13 @@ def collect_checks(root: Path) -> List[Check]:
     for name, target in (
         ("api", root / "api"),
         ("gui", settings.frontend_source_dir),
-        ("ppx/assets", settings.asset_dir),
+        (settings.paths.assets, settings.asset_dir),
         ("api/requirements.txt", root / "api/requirements.txt"),
     ):
         checks.append(Check(target.exists(), name, "存在" if target.exists() else "缺失"))
-    for filename in ("logo.png", "logo.ico", "logo.icns", "dmg-background.png"):
+    required_assets = {"Windows": ("logo.png", "logo.ico"),
+                       "Darwin": ("logo.png", "logo.icns", "dmg-background.png")}
+    for filename in required_assets.get(platform.system(), ("logo.png",)):
         target = settings.asset_dir / filename
         checks.append(Check(target.is_file(), f"资源 {filename}", "存在" if target.is_file() else "缺失"))
 

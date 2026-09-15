@@ -13,7 +13,7 @@ modules = ["api.api"]
 [paths]
 frontend = "gui"
 resources = "api/resources"
-assets = "ppx/assets"
+assets = "assets/branding"
 [window]
 widthRatio = 0.85
 heightRatio = 0.85

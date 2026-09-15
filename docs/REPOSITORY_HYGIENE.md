@@ -2,9 +2,9 @@
 
 ## 提交范围
 
-提交根目录应用源码、`api/`、`assistant/`、`data_toolkit/`、`gui/src/`、`tests/`、`scripts/`、固定的 `vendor/` 源码、`ppx/assets/`、依赖锁文件、许可证和当前项目文档。
+提交根目录应用源码、`api/`、`assistant/`、`data_toolkit/`、`gui/src/`、`tests/`、`scripts/`、固定的 `vendor/` 源码、`assets/branding/`、依赖锁文件、许可证和当前项目文档。
 
-`vendor/` 是直接参与构建的 PPX 与 Qwen SDK 固定源码，不是可随意移除的缓存。`ppx/assets/` 的图标同样参与打包。锁文件用于重建环境，须提交。
+`vendor/` 是直接参与构建的 PPX 与 Qwen SDK 固定源码，不是可随意移除的缓存。`assets/branding/` 的图标同样参与打包。锁文件用于重建环境，须提交。
 
 ## 忽略与可清理内容
 

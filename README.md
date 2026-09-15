@@ -1,6 +1,8 @@
-# 内网 Excel 数据助手
+# Excel 数据助手
 
-基于 PPX V6、Vue 3、Univer、Qwen Code 和 DataCraft 的 Windows 本机 Excel 工作台。支持表格编辑、公式、格式与历史版本，以及多文件合并、关联、清洗、对账、汇总、计算列、条件分级、无文件建表和简单模板填写。无需模型也可编辑表格、执行常用操作及保存的规则。
+<img src="assets/branding/logo.svg" alt="Excel 数据助手" width="96" height="96">
+
+面向内网业务的 Windows 本机 Excel 工作台。支持表格编辑、公式、格式与历史版本，以及多文件合并、关联、清洗、对账、汇总、计算列、条件分级、无文件建表和简单模板填写。无需模型也可编辑表格、执行常用操作及保存的规则。
 
 ## 开发启动
 
@@ -15,7 +17,7 @@ npm run build --prefix gui
 .\.venv\Scripts\python.exe main.py
 ```
 
-PPX Python 源码直接从 `vendor/ppx-py/src` 加载；无需额外安装 PPX。原始项目快照仅在本地 docs 中保留，不纳入公开仓库，也不是运行依赖。修改请针对根目录应用和 data_toolkit；提交与清理规则见 [目录清理说明](docs/REPOSITORY_HYGIENE.md)。
+固定的桌面运行时已随源码提供；技术来源与本地修改见 [第三方说明](THIRD_PARTY_NOTICES.md)。原始项目快照仅在本地 docs 中保留，不纳入公开仓库，也不是运行依赖。修改请针对根目录应用和 data_toolkit；提交与清理规则见 [目录清理说明](docs/REPOSITORY_HYGIENE.md)。
 
 ## 使用
 
@@ -42,7 +44,7 @@ npm run build --prefix gui
 
 对应源码按 Git 跟踪清单归档，与 WebView2 安装介质是否存在无关。解压交付包内的 `corresponding-source.zip` 后，也可通过内置源码清单重新打包。开发构建请使用 Git 克隆或该对应源码包，不依赖本地历史快照。
 
-便携包输出到 `build/ExcelAssistant`。保留整个目录，客户运行 `ExcelAssistant.exe`，无需自行安装 Node/Python。构建脚本使用 PPX 的 PyInstaller 规格生成器并添加应用专用入口和 MCP 进程。开发人员先运行 `scripts/fetch_webview2.ps1` 下载并验证微软离线安装介质，构建时将其附在 `prerequisites/`。缺少 WebView2 时可从原生提示或环境页面启动随包安装程序；权限不足时由 IT 处理。交付前执行 [离线验收](docs/OFFLINE_ACCEPTANCE.md)。
+便携包输出到 `build/ExcelAssistant`。保留整个目录，客户运行 `ExcelAssistant.exe`，无需自行安装 Node/Python。便携包包含应用专用入口与 MCP 进程。开发人员先运行 `scripts/fetch_webview2.ps1` 下载并验证微软离线安装介质，构建时将其附在 `prerequisites/`。缺少 WebView2 时可从原生提示或环境页面启动随包安装程序；权限不足时由 IT 处理。交付前执行 [离线验收](docs/OFFLINE_ACCEPTANCE.md)。
 
 ## 当前边界
 
@@ -55,6 +57,9 @@ npm run build --prefix gui
 - 单实例单任务执行；半途失败保留已完成结果和错误记录，重新执行不会覆盖旧输出。
 
 许可证与第三方来源见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+
+应用使用自有图标。素材维护、桌面接入和打包验证见 [品牌资源说明](docs/BRANDING.md)。
+
 ## 使用与验收文档
 
 业务界面已按“文件与处理 / 结果与核对”组织，支持后台分页预览、常用操作、中文结果指标与按需环境设置。请参阅 [工作台使用说明](docs/WORKBENCH.md) 和 [本地性能记录](docs/PERFORMANCE.md)。

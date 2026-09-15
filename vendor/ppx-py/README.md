@@ -1,5 +1,3 @@
-<p align="center"><img src="https://raw.githubusercontent.com/pangao1990/PPX/main/ppx/assets/logo.png" width="100" alt="PPX 原版 LOGO" /></p>
-
 # ppx-py
 
 PPX 是一个开源的跨平台桌面应用框架：用 Python 编写业务，用 JavaScript 构建界面，为 Windows、macOS 和 Linux 生成桌面客户端。可以选择 Vanilla JavaScript、Vue 或 React，不需要维护 pywebview 入口、PyInstaller spec 或安装器脚本。
@@ -57,20 +55,6 @@ ppx build                        生成当前平台应用和安装包
 `ppx icon` 接受至少 512×512 的方形 PNG、JPEG 或 WebP 图片，在 `ppx/assets/` 原子生成 `logo.png`、`logo.ico` 与 `logo.icns`。DMG 背景图仍由开发者单独维护。
 
 完整文档：[PPX 文档](https://blog.pangao.vip/docs-ppx/v6/guide/introduction)
-
-## 支持 PPX
-
-如果 PPX 帮助你完成了项目，欢迎 Star、提交问题或参与改进。也可以通过以下二维码支持开源维护，感谢每一份支持。
-
-| 微信支付 | 支付宝 |
-| --- | --- |
-| <img src="https://blog.pangao.vip/images/wechatpay.jpg" width="220" alt="潘高的微信支付二维码" /> | <img src="https://blog.pangao.vip/images/alipay.png" width="220" alt="潘高的支付宝二维码" /> |
-
-## 关注公众号
-
-更多 Python、Web 和桌面开发教程，请关注 **潘高陪你学编程**。
-
-<img src="https://blog.pangao.vip/pic/%E6%BD%98%E9%AB%98%E9%99%AA%E4%BD%A0%E5%AD%A6%E7%BC%96%E7%A8%8B.jpg" width="360" alt="微信公众号：潘高陪你学编程" />
 
 ## 开源协议
 

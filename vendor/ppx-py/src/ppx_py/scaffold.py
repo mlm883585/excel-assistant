@@ -26,6 +26,10 @@ def _slug(name: str) -> str:
 
 
 def create_project(name: str, directory: Optional[str] = None, frontend: str = "vanilla") -> Path:
+    # This application distribution omits the upstream promotional template assets.
+    # Fail before creating any directories if the full upstream CLI is requested.
+    if not files("ppx_py").joinpath("template/assets/logo.png").is_file():
+        raise RuntimeError("本项目随附运行时不提供新项目模板；创建项目请使用上游完整发行版。")
     if frontend not in SUPPORTED_FRONTENDS:
         raise ValueError(f"不支持的前端模板 {frontend}，可选值: {', '.join(SUPPORTED_FRONTENDS)}")
     slug = _slug(name)

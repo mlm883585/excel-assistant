@@ -4,7 +4,7 @@
 
 本仓库为 Windows 内网 Excel 助手。`main.py` 启动 PPX；`gui/src/` 为 Vue 3 / TypeScript 界面；`api/` 提供 RPC；`assistant/` 实现任务、模型适配、Excel 与 MCP 服务；`data_toolkit/` 为迁入的数据处理核心。
 
-`tests/` 保存 unittest 测试；`scripts/` 提供检查、打包与离线介质准备；`docs/` 保存实现和验收文档。`vendor/` 是固定的 PPX、Qwen SDK 源码，`ppx/assets/` 是打包资源，均须提交。两个历史项目快照只在本地保留，不是运行依赖，不提交其嵌套仓库。
+`tests/` 保存 unittest 测试；`scripts/` 提供检查、打包与离线介质准备；`docs/` 保存实现和验收文档。`vendor/` 是固定的 PPX、Qwen SDK 源码，`assets/branding/` 是打包资源，均须提交。两个历史项目快照只在本地保留，不是运行依赖，不提交其嵌套仓库。
 
 ## 构建、测试与开发命令
 

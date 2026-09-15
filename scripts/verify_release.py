@@ -8,6 +8,7 @@ from zipfile import ZipFile
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.source_archive import source_files
+from scripts.verify_branding import verify_branding
 
 
 def digest(path):
@@ -62,6 +63,7 @@ def main():
         'runtime_licenses': len(licenses), 'frontend_files': len(ui_files),
         'total_mib': round(sum((bundle / name).stat().st_size for name in manifest) / 1024 ** 2, 1),
         'offline_webview2_installer': (bundle / 'prerequisites/WebView2StandaloneX64.exe').is_file(),
+        'branding': verify_branding(ROOT, bundle),
     }
     (ROOT / 'build/release-verification.json').write_text(json.dumps(result, indent=2), encoding='utf-8')
     print(json.dumps(result), flush=True)

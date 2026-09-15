@@ -60,6 +60,10 @@ class ReleaseAssetsTests(unittest.TestCase):
             source_files(unpacked)
 
     def test_sources_generated_without_webview_installer(self):
+        for name in ('logo.svg', 'logo.png', 'logo.ico'):
+            path = self.root / 'assets/branding' / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b'branding fixture')
         destination = self.root / 'build/ExcelAssistant'
         destination.mkdir(parents=True)
         (destination / 'ExcelAssistant.exe').write_bytes(b'test fixture, not an executable')
@@ -67,6 +71,8 @@ class ReleaseAssetsTests(unittest.TestCase):
         self.assertTrue((destination / 'corresponding-source.zip').is_file())
         manifest = json.loads((destination / 'manifest.sha256.json').read_text())
         self.assertIn('corresponding-source.zip', manifest)
+        self.assertEqual((destination / 'assets/branding/logo.svg').read_bytes(), b'branding fixture')
+        self.assertTrue(any(name.replace('\\', '/') == 'assets/branding/logo.ico' for name in manifest))
 
 
 if __name__ == '__main__':

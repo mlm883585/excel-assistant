@@ -57,7 +57,8 @@ class Application:
         for name, handler in methods.items():
             self.bridge.register(name, handler)
 
-    def run(self, *, dev: bool = False, cef: bool = False) -> None:
+    def run(self, *, dev: bool = False, cef: bool = False,
+            title: Union[str, None] = None, icon: Union[str, Path, None] = None) -> None:
         import webview
 
         if dev:
@@ -72,7 +73,7 @@ class Application:
         width = int(screen.width * self.settings.window.width_ratio)
         height = int(screen.height * self.settings.window.height_ratio)
         self.window = webview.create_window(
-            title=self.settings.project.name,
+            title=title if title is not None else self.settings.project.name,
             url=url,
             js_api=JavascriptAPI(self.bridge),
             width=width,
@@ -90,7 +91,8 @@ class Application:
         self.bridge.set_window(self.window)
         self.window.events.shown += self._on_shown
         import sys
-        webview.start(debug=dev, http_server=True, gui="edgechromium" if sys.platform == "win32" else ("cef" if cef else None))
+        webview.start(debug=dev, http_server=True, icon=str(icon) if icon is not None else None,
+                      gui="edgechromium" if sys.platform == "win32" else ("cef" if cef else None))
 
     def _on_shown(self, *_args: Any) -> None:
         self.storage.initialize()

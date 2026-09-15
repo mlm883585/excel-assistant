@@ -8,6 +8,7 @@ import { call, statusLabels, type Task, type Selection } from './rpc'
 import { useTaskSession } from './composables/useTaskSession'
 import { useWorkbookSession } from './composables/useWorkbookSession'
 import type { WorkbookContext, WorkbookSelection } from './workbook/types'
+const brandLogo = `${import.meta.env.BASE_URL}branding/logo.svg`
 const EnvironmentPanel = defineAsyncComponent(() => import('./EnvironmentPanel.vue'))
 const WorkbookEditor = defineAsyncComponent(() => import('./WorkbookEditor.vue'))
 const ruleFields = ref<{ params: () => Record<string, unknown> }>()
@@ -140,7 +141,7 @@ onMounted(async () => {
 
 <template>
   <div class="shell">
-    <aside class="sidebar"><div class="brand"><span class="mark">▦</span><div>Excel 数据助手<small>内网业务工作台</small></div></div><el-button type="primary" class="wide" :disabled="busy" @click="action(newTask)">＋ 新建任务</el-button>
+    <aside class="sidebar"><div class="brand"><img class="mark" :src="brandLogo" alt="Excel 数据助手" width="38" height="38"><div>Excel 数据助手<small>内网业务工作台</small></div></div><el-button type="primary" class="wide" :disabled="busy" @click="action(newTask)">＋ 新建任务</el-button>
       <nav class="task-navigation" aria-label="任务导航"><h3>最近任务</h3><button v-for="item in history" :key="item.id" class="history" :class="{selected:task?.id===item.id}" :disabled="busy && task?.id!==item.id" @click="action(()=>selectTask(item.id))"><span>{{item.name}}</span><small>{{statusLabels[item.status]}}</small></button><el-button v-if="historyOffset" text @click="action(()=>refreshLists())">返回最近任务</el-button><el-button v-if="moreTasks" text @click="action(()=>refreshLists(true))">加载更多任务</el-button>
       <template v-if="view==='editor' && task?.files.length"><h3>任务文件</h3><button v-for="f in task.files" :key="f.id" class="history" :disabled="busy" @click="action(()=>openBook(undefined,f.id))"><span>▦ {{f.name}}</span><small>打开副本编辑</small></button></template><h3>常用任务</h3><p v-if="!recipes.length" class="muted">完成一次处理后，可将步骤保存到这里。</p><button v-for="recipe in recipes" :key="recipe.id" class="history" :disabled="busy || !task" @click="action(()=>applyRecipe(recipe.id))"><span>{{recipe.name}}</span><small>按保存顺序准备 {{recipe.slots.length}} 份文件</small></button></nav>
       <button class="settings-link" @click="openEnvironment">⚙ 设置与环境 <span class="status-dot" :class="{ready:runtime.ready}" /></button><p class="local-note">文件在本机处理</p>

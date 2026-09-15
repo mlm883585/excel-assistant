@@ -48,8 +48,9 @@ def main():
     shutil.copy2(node,runtime/'node.exe')
     for name in ['README.md','LICENSE','THIRD_PARTY_NOTICES.md']:
         shutil.copy2(ROOT/name,destination/name)
-    for license_name in ['LICENSE','README.md']:
-        shutil.copy2(ROOT/'vendor/ppx-py'/license_name,destination/f'PPX-{license_name}')
+    ppx_licenses = destination / 'licenses/ppx'
+    ppx_licenses.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT/'vendor/ppx-py/LICENSE', ppx_licenses/'LICENSE')
     shutil.copy2(ROOT/'vendor/QWEN-LICENSE',destination/'QWEN-LICENSE')
     shutil.copy2(ROOT/'vendor/NODE-LICENSE.txt',destination/'NODE-LICENSE.txt')
     shutil.copy2(ROOT/'docs/OFFLINE_ACCEPTANCE.md',destination/'OFFLINE_ACCEPTANCE.md')

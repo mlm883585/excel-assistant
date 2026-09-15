@@ -34,6 +34,8 @@ def create_spec(root: Path, settings: Settings, console: bool) -> Path:
     if not settings.frontend_dir.is_dir():
         raise FileNotFoundError(f"缺少前端产物: {settings.frontend_dir}")
     datas = [(str(settings.frontend_dir), "web"), (str(settings.config_path), ".")]
+    # The application passes the same ICO to the native window at runtime.
+    datas.append((str(icon), settings.paths.assets))
     if settings.resource_source_dir.is_dir():
         datas.append((str(settings.resource_source_dir), "resources"))
     hidden = list(settings.python.modules)
