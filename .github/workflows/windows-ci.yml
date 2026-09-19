@@ -69,12 +69,27 @@ jobs:
       - name: Bundle offline build kit
         if: github.event_name == 'workflow_dispatch' && inputs.build_portable
         run: python scripts/package_offline_kit.py
+      - name: Archive third-party licenses
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: |
+          python scripts/archive_gui_licenses.py
+          python scripts/archive_gui_licenses.py --cli
+          python scripts/archive_python_licenses.py
       - name: Build portable application
         if: github.event_name == 'workflow_dispatch' && inputs.build_portable
         run: python scripts/build.py
       - name: Verify packaged MCP export
         if: github.event_name == 'workflow_dispatch' && inputs.build_portable
         run: python scripts/smoke_frozen_mcp.py
+      - name: Verify frozen environment
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/smoke_frozen_environment.py
+      - name: Verify frozen preview
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/smoke_frozen_preview.py
+      - name: Verify release bundle and licenses
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/verify_release.py
       - name: Retain test report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
