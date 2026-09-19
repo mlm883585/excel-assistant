@@ -22,6 +22,7 @@ def main():
     from api import api
     app.bridge = Bridge()
     app.register_api(api)
+    api.set_app_version(app.settings.project.version)
     import atexit
     atexit.register(api.shutdown)
     if '--smoke' not in sys.argv:

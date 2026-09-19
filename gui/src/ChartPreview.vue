@@ -5,8 +5,18 @@ import { BarChart, LineChart, PieChart } from 'echarts/charts'
 import { GridComponent, LegendComponent, TitleComponent, TooltipComponent } from 'echarts/components'
 import { CanvasRenderer } from 'echarts/renderers'
 import type { ChartData } from './rpc'
+import { isDark } from './theme'
 
 echarts.use([BarChart, LineChart, PieChart, GridComponent, LegendComponent, TitleComponent, TooltipComponent, CanvasRenderer])
+echarts.registerTheme('excel-dark', {
+  backgroundColor: 'transparent',
+  textStyle: { color: '#d4ded8' },
+  title: { textStyle: { color: '#d4ded8' } },
+  legend: { textStyle: { color: '#92a69b' } },
+  tooltip: { backgroundColor: '#1b2520', borderColor: '#2a3a33', textStyle: { color: '#d4ded8' } },
+  categoryAxis: { axisLine: { lineStyle: { color: '#2a3a33' } }, axisTick: { lineStyle: { color: '#2a3a33' } }, axisLabel: { color: '#92a69b' }, splitLine: { show: false } },
+  valueAxis: { axisLine: { show: false }, axisLabel: { color: '#92a69b' }, splitLine: { lineStyle: { color: '#24302b' } } },
+})
 
 const props = defineProps<{ chart: ChartData }>()
 const host = ref<HTMLElement>()
@@ -58,14 +68,21 @@ function render() {
   instance.setOption(option(), true)
 }
 
-onMounted(() => {
+function mount() {
   if (!host.value) return
-  instance = echarts.init(host.value)
+  instance = echarts.init(host.value, isDark.value ? 'excel-dark' : undefined)
   render()
   resizeObserver = new ResizeObserver(() => instance?.resize())
   resizeObserver.observe(host.value)
-})
+}
+onMounted(mount)
 watch(() => props.chart, render, { deep: true })
+watch(isDark, () => {
+  resizeObserver?.disconnect()
+  instance?.dispose()
+  instance = null
+  mount()
+})
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   instance?.dispose()
@@ -81,7 +98,7 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
-.chart-preview { margin: 16px 0; border: 1px solid #e4e8ee; border-radius: 8px; background: #fff; overflow: hidden; }
+.chart-preview { margin: 16px 0; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); overflow: hidden; }
 .chart-host { width: 100%; height: 360px; }
-.chart-empty { display: flex; align-items: center; justify-content: center; height: 160px; color: #8a97a8; }
+.chart-empty { display: flex; align-items: center; justify-content: center; height: 160px; color: var(--text-faint); }
 </style>

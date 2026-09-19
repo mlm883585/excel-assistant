@@ -8,6 +8,7 @@
     "build": "vue-tsc --noEmit && vite build"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "2.3.2",
     "@univerjs/core": "0.25.1",
     "@univerjs/design": "0.25.1",
     "@univerjs/docs": "0.25.1",

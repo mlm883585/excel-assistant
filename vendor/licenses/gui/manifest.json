@@ -1410,6 +1410,31 @@
     ]
   },
   {
+    "name": "echarts",
+    "version": "5.6.0",
+    "license": "Apache-2.0",
+    "source": {
+      "type": "git",
+      "url": "git+https://github.com/apache/echarts.git"
+    },
+    "files": [
+      "vendor/licenses/gui/echarts@5.6.0/LICENSE",
+      "vendor/licenses/gui/echarts@5.6.0/NOTICE"
+    ]
+  },
+  {
+    "name": "tslib",
+    "version": "2.3.0",
+    "license": "0BSD",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/Microsoft/tslib.git"
+    },
+    "files": [
+      "vendor/licenses/gui/tslib@2.3.0/LICENSE.txt"
+    ]
+  },
+  {
     "name": "element-plus",
     "version": "2.14.5",
     "license": "MIT",
@@ -2144,6 +2169,30 @@
     },
     "files": [
       "vendor/licenses/gui/yargs-parser@21.1.1/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "zrender",
+    "version": "5.6.1",
+    "license": "BSD-3-Clause",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/ecomfe/zrender.git"
+    },
+    "files": [
+      "vendor/licenses/gui/zrender@5.6.1/LICENSE"
+    ]
+  },
+  {
+    "name": "tslib",
+    "version": "2.3.0",
+    "license": "0BSD",
+    "source": {
+      "type": "git",
+      "url": "https://github.com/Microsoft/tslib.git"
+    },
+    "files": [
+      "vendor/licenses/gui/tslib@2.3.0/LICENSE.txt"
     ]
   }
 ]

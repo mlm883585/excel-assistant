@@ -116,4 +116,4 @@ const issueColumns = computed(() => [...new Set((file.value?.issues || []).flatM
     </template>
   </section>
 </template>
-<style scoped>.operation-step{display:flex;gap:14px;align-items:center;padding:16px;background:#f3f6fa;border-radius:8px;margin-top:16px}.review-counts{display:flex;gap:16px;margin:12px 0;font-size:12px;color:#53657c}.old-value{white-space:pre-wrap;background:#fff0ee;color:#9b4238}.new-value{white-space:pre-wrap;background:#e9f7ef;color:#246d48}.change-table{margin-bottom:16px}</style>
+<style scoped>.operation-step{display:flex;gap:14px;align-items:center;padding:16px;background:var(--info-soft);border-radius:8px;margin-top:16px}.review-counts{display:flex;gap:16px;margin:12px 0;font-size:12px;color:var(--text-muted)}.old-value{white-space:pre-wrap;background:var(--diff-del-bg);color:var(--diff-del-text)}.new-value{white-space:pre-wrap;background:var(--diff-add-bg);color:var(--diff-add-text)}.change-table{margin-bottom:16px}</style>

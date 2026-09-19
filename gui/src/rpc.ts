@@ -14,5 +14,7 @@ export type RunItem = { input: string; status: string; outputs: { name: string; 
 export type RunRecord = { run_id: string; trigger: string; started_at: string; finished_at: string | null; status: string; total: number; succeeded: number; failed: number; items: RunItem[] }
 export type Schedule = { id: string; name: string; recipe_id: string; recipe_name: string | null; source_dir: string; output_dir: string; trigger: ScheduleTrigger; enabled: boolean; created_at: string; last_run_at: string | null; next_run_at: string | null; runs: RunRecord[] }
 export type AutomationStatus = { active: RunRecord | null; queue_len: number }
+export type UpdateInfo = { version: string; base_url: string; enabled: boolean }
+export type UpdateStatus = { update_available: boolean; current_version: string; latest_version?: string; url?: string; sha256?: string; size_bytes?: number; notes?: string; published_at?: string; reason?: string; error?: string }
 export const statusLabels: Record<string, string> = { pending: '待处理', running: '处理中', waiting: '等待回答', succeeded: '已完成', failed: '需处理', cancelled: '已取消' }
 export const runStatusLabels: Record<string, string> = { running: '运行中', succeeded: '成功', failed: '失败', partial: '部分成功', cancelled: '已取消' }

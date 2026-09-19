@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onBeforeUnmount, reactive, ref, watch } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 import { ppx } from 'ppx-js'
 import { schedules, recipes, active, queueLen, pending, initialized, message, messageType } from './schedulerState'
 import { runStatusLabels, type AutomationStatus, type Recipe, type Schedule } from './rpc'
@@ -141,7 +142,7 @@ onBeforeUnmount(() => { if (timer) window.clearTimeout(timer) })
     <el-alert v-if="busy" title="当前有前台任务在处理，批量运行会自动等待其结束。" type="info" :closable="false" show-icon />
 
     <div v-if="tab === 'list'">
-      <div class="panel-actions"><el-button type="primary" @click="newForm">＋ 新建自动化任务</el-button><el-button :disabled="pending" @click="perform(refresh)">刷新</el-button></div>
+      <div class="panel-actions"><el-button type="primary" :icon="Plus" @click="newForm">新建自动化任务</el-button><el-button :disabled="pending" @click="perform(refresh)">刷新</el-button></div>
       <el-empty v-if="!schedules.length" description="还没有自动化任务；先完成一次处理并保存为常用规则，再在此建立批量或定时。" :image-size="60" />
       <el-table v-else :data="schedules" stripe>
         <el-table-column prop="name" label="名称" min-width="130" />
@@ -207,6 +208,6 @@ onBeforeUnmount(() => { if (timer) window.clearTimeout(timer) })
 .folder-row .el-input { flex: 1; }
 .preset-row { display: flex; flex-wrap: wrap; gap: 8px; }
 .history-block { margin: 14px 0; }
-.run-card { border: 1px solid #dce4ec; border-radius: 8px; padding: 10px; margin: 8px 0; }
+.run-card { border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin: 8px 0; }
 .run-head { display: flex; gap: 12px; align-items: center; margin-bottom: 8px; }
 </style>

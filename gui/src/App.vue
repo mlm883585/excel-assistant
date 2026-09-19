@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onMounted, ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { Plus, Timer, Setting, Document, Sunny, Moon, Monitor } from '@element-plus/icons-vue'
+import { themeMode, setThemeMode, type ThemeMode } from './theme'
 import FilePreview from './FilePreview.vue'
 import PivotBuilder from './PivotBuilder.vue'
 import ResultPanel from './ResultPanel.vue'
 import RuleFields from './RuleFields.vue'
-import { call, statusLabels, type Task, type Selection } from './rpc'
+import { call, statusLabels, type Task, type Selection, type UpdateStatus } from './rpc'
 import { useTaskSession } from './composables/useTaskSession'
 import { useWorkbookSession } from './composables/useWorkbookSession'
 import type { WorkbookContext, WorkbookSelection } from './workbook/types'
 const brandLogo = `${import.meta.env.BASE_URL}branding/logo.svg`
+const themeOrder: ThemeMode[] = ['light', 'dark', 'auto']
+const themeLabels: Record<ThemeMode, string> = { light: '浅色', dark: '深色', auto: '跟随系统' }
+const themeIcons = { light: Sunny, dark: Moon, auto: Monitor }
+function cycleTheme() { setThemeMode(themeOrder[(themeOrder.indexOf(themeMode.value) + 1) % themeOrder.length]) }
 const EnvironmentPanel = defineAsyncComponent(() => import('./EnvironmentPanel.vue'))
 const WorkbookEditor = defineAsyncComponent(() => import('./WorkbookEditor.vue'))
 const AutomationPanel = defineAsyncComponent(() => import('./AutomationPanel.vue'))
@@ -76,6 +82,14 @@ async function action(fn: () => Promise<unknown>) { try { await fn() } catch (e)
 function openEnvironment() { environmentLoaded.value = true; environmentOpen.value = true }
 function openAutomation() { automationLoaded.value = true; automationOpen.value = true }
 async function refreshEnvironment() { runtime.value = await call('runtime.status') }
+async function checkForUpdates() {
+  try {
+    const status = await call<UpdateStatus>('update.check')
+    if (status.update_available && status.url) {
+      ElNotification({ title: '发现新版本', message: `v${status.latest_version} 可下载：${status.url}`, type: 'warning', duration: 0 })
+    }
+  } catch { /* 更新检查失败不影响使用，静默忽略 */ }
+}
 async function openReviewed(id: string, exportNow = false, outputId?: string) { await openBook(id,undefined,undefined,exportNow?outputId:undefined) }
 function editorContext(value: WorkbookContext) {
   workbookContext.value = value
@@ -166,6 +180,7 @@ async function saveRecipe() {
 function message(data: unknown): string { return typeof data === 'string' ? data : data && typeof data === 'object' ? String((data as any).message || (data as any).text || '处理状态已更新') : String(data ?? '') }
 onMounted(async () => {
   void action(refreshEnvironment)
+  void checkForUpdates()
   try { await refreshLists(); if (history.value[0]) await selectTask(history.value[0].id); else await newTask() }
   catch (e) { startupError.value = String(e); loading.value = false }
 })
@@ -173,10 +188,10 @@ onMounted(async () => {
 
 <template>
   <div class="shell">
-    <aside class="sidebar"><div class="brand"><img class="mark" :src="brandLogo" alt="Excel 数据助手" width="38" height="38"><div>Excel 数据助手<small>内网业务工作台</small></div></div><el-button type="primary" class="wide" :disabled="busy" @click="action(newTask)">＋ 新建任务</el-button>
+    <aside class="sidebar"><div class="brand"><img class="mark" :src="brandLogo" alt="Excel 数据助手" width="38" height="38"><div>Excel 数据助手<small>内网业务工作台</small></div></div><el-button type="primary" class="wide" :disabled="busy" :icon="Plus" @click="action(newTask)">新建任务</el-button>
       <nav class="task-navigation" aria-label="任务导航"><h3>最近任务</h3><button v-for="item in history" :key="item.id" class="history" :class="{selected:task?.id===item.id}" :disabled="busy && task?.id!==item.id" @click="action(()=>selectTask(item.id))"><span>{{item.name}}</span><small>{{statusLabels[item.status]}}</small></button><el-button v-if="historyOffset" text @click="action(()=>refreshLists())">返回最近任务</el-button><el-button v-if="moreTasks" text @click="action(()=>refreshLists(true))">加载更多任务</el-button>
-      <template v-if="view==='editor' && task?.files.length"><h3>任务文件</h3><button v-for="f in task.files" :key="f.id" class="history" :disabled="busy" @click="action(()=>openBook(undefined,f.id))"><span>▦ {{f.name}}</span><small>打开副本编辑</small></button></template><h3>常用任务</h3><p v-if="!recipes.length" class="muted">完成一次处理后，可将步骤保存到这里。</p><button v-for="recipe in recipes" :key="recipe.id" class="history" :disabled="busy || !task" @click="action(()=>applyRecipe(recipe.id))"><span>{{recipe.name}}</span><small>按保存顺序准备 {{recipe.slots.length}} 份文件</small></button></nav>
-      <button class="settings-link" @click="openAutomation">⏱ 批量与定时</button><button class="settings-link" @click="openEnvironment">⚙ 设置与环境 <span class="status-dot" :class="{ready:runtime.ready}" /></button><p class="local-note">文件在本机处理</p>
+      <template v-if="view==='editor' && task?.files.length"><h3>任务文件</h3><button v-for="f in task.files" :key="f.id" class="history" :disabled="busy" @click="action(()=>openBook(undefined,f.id))"><span><el-icon><Document/></el-icon>{{f.name}}</span><small>打开副本编辑</small></button></template><h3>常用任务</h3><p v-if="!recipes.length" class="muted">完成一次处理后，可将步骤保存到这里。</p><button v-for="recipe in recipes" :key="recipe.id" class="history" :disabled="busy || !task" @click="action(()=>applyRecipe(recipe.id))"><span>{{recipe.name}}</span><small>按保存顺序准备 {{recipe.slots.length}} 份文件</small></button></nav>
+      <button class="settings-link" @click="openAutomation"><el-icon><Timer/></el-icon>批量与定时</button><button class="settings-link" @click="openEnvironment"><el-icon><Setting/></el-icon>设置与环境 <span class="status-dot" :class="{ready:runtime.ready}" /></button><button class="theme-toggle" @click="cycleTheme"><el-icon><component :is="themeIcons[themeMode]" /></el-icon>主题 · {{themeLabels[themeMode]}}</button><p class="local-note">文件在本机处理</p>
     </aside>
     <main class="main-content">
       <header class="task-header"><div><p class="eyebrow">EXCEL 工作台</p><h1>{{task?.files[0]?.name || '开始整理你的业务数据'}}</h1><p class="muted">{{busy ? '正在处理，请留意进度或待确认的问题' : task?.outputs.length ? '结果已保留，可以核对或继续处理' : '添加文件，选择处理方式，再核对结果'}}</p></div><el-tag v-if="task" :type="task.status==='failed'?'danger':busy?'warning':'success'">{{statusLabels[task.status]}}</el-tag></header>
@@ -184,13 +199,13 @@ onMounted(async () => {
       <div v-if="startupError" class="panel"><el-alert :title="startupError" type="warning" :closable="false"/><el-button @click="openEnvironment">打开环境检测</el-button></div>
       <div v-else-if="loading" class="panel empty">正在加载工作台…</div>
       <template v-else-if="task">
-        <div class="workspace-tabs" role="tablist" aria-label="任务视图"><button role="tab" :aria-selected="view==='work'" :class="{active:view==='work'}" @click="action(()=>changeView('work'))">① 文件与处理</button><button v-if="workbookId" role="tab" :aria-selected="view==='editor'" :class="{active:view==='editor'}" @click="action(()=>changeView('editor'))">表格编辑器</button><button role="tab" :aria-selected="view==='result'" :class="{active:view==='result'}" @click="action(()=>changeView('result'))">② 结果与核对 <span v-if="task.outputs.length">{{task.outputs.length}}</span></button><el-button :disabled="busy" @click="action(()=>openBook())">＋ 空白工作簿</el-button></div>
+        <div class="workspace-tabs" role="tablist" aria-label="任务视图"><button role="tab" :aria-selected="view==='work'" :class="{active:view==='work'}" @click="action(()=>changeView('work'))">① 文件与处理</button><button v-if="workbookId" role="tab" :aria-selected="view==='editor'" :class="{active:view==='editor'}" @click="action(()=>changeView('editor'))">表格编辑器</button><button role="tab" :aria-selected="view==='result'" :class="{active:view==='result'}" @click="action(()=>changeView('result'))">② 结果与核对 <span v-if="task.outputs.length">{{task.outputs.length}}</span></button><el-button :disabled="busy" :icon="Plus" @click="action(()=>openBook())">空白工作簿</el-button></div>
         <div v-if="books.length" class="workbook-chips"><span>任务工作簿</span><button v-for="b in books" :key="b.id" :class="{active:workbookId===b.id && view==='editor'}" :disabled="busy" @click="action(()=>openBook(b.id))">{{b.name}} · v{{b.revision}}</button></div>
         <div v-if="view!=='result'" class="work-layout" :class="{'editor-layout':view==='editor'}">
           <WorkbookEditor v-if="view==='editor' && workbookId" :key="`${task.id}-${workbookId}-${editorKey}`" ref="editor" :task-id="task.id" :workbook-id="workbookId" :revision="workbookRevision" :busy="busy" :auto-export="autoExport" @context="editorContext" @export-handled="autoExport=undefined" @view-version="(id:string,revision:number)=>action(()=>openBook(id,undefined,revision))" @extracted="(id:string)=>action(()=>openBook(id))" @saved="action(refreshBooks)"/>
-          <section v-else class="panel files-panel"><div class="section-title"><div><h2>输入文件 <small>{{task.files.length}} / 10</small></h2><p class="muted">支持 Excel 与 CSV，保留原文件副本</p></div><el-button :disabled="busy" @click="action(addFiles)">＋ 添加文件</el-button></div>
-            <div v-if="!task.files.length" class="empty file-empty"><span class="empty-icon">▦</span><strong>从一份业务表格开始</strong><p>库存、订单、ERP 导出表或输出模板</p><el-button type="primary" @click="action(addFiles)">选择 Excel / CSV</el-button></div>
-            <template v-else><div class="file-chips"><button v-for="f in task.files" :key="f.id" :class="{active:activeFile===f.id}" :disabled="busy" @click="activeFile=f.id">▦ {{f.name}}</button></div><el-button :disabled="busy" @click="action(()=>openBook(undefined,activeFile))">在表格编辑器中打开</el-button><p class="muted">超出 20 万有效单元格时继续使用下方分页预览与全量处理。</p><FilePreview :task-id="task.id" :file="file" :busy="busy" :initial="selections[activeFile]" @selection="s=>selections[s.file_id]=s" @columns="v=>fields=v" /></template>
+          <section v-else class="panel files-panel"><div class="section-title"><div><h2>输入文件 <small>{{task.files.length}} / 10</small></h2><p class="muted">支持 Excel 与 CSV，保留原文件副本</p></div><el-button :disabled="busy" :icon="Plus" @click="action(addFiles)">添加文件</el-button></div>
+            <div v-if="!task.files.length" class="empty file-empty"><el-icon class="empty-icon"><Document/></el-icon><strong>从一份业务表格开始</strong><p>库存、订单、ERP 导出表或输出模板</p><el-button type="primary" @click="action(addFiles)">选择 Excel / CSV</el-button></div>
+            <template v-else><div class="file-chips"><button v-for="f in task.files" :key="f.id" :class="{active:activeFile===f.id}" :disabled="busy" @click="activeFile=f.id"><el-icon><Document/></el-icon>{{f.name}}</button></div><el-button :disabled="busy" @click="action(()=>openBook(undefined,activeFile))">在表格编辑器中打开</el-button><p class="muted">超出 20 万有效单元格时继续使用下方分页预览与全量处理。</p><FilePreview :task-id="task.id" :file="file" :busy="busy" :initial="selections[activeFile]" @selection="s=>selections[s.file_id]=s" @columns="v=>fields=v" /></template>
           </section>
           <section class="panel processing-panel"><h2>处理方式</h2><div v-if="view==='editor' && workbookContext" class="input-context"><strong>{{workbookContext.sheet_name}}</strong><p>当前选区 {{workbookContext.address}} · 版本 {{workbookContext.version}}</p><el-radio-group v-model="inputScope" :disabled="busy" @change="editorContext(workbookContext)"><el-radio-button value="sheet">整张表数据</el-radio-button><el-radio-button value="range">选区数据</el-radio-button></el-radio-group><p class="muted">数据输入首行为表头；编辑要求将显示选区并生成待核对候选。</p></div><el-tabs v-model="mode"><el-tab-pane label="常用操作" name="tools"/><el-tab-pane label="用文字描述" name="agent"/></el-tabs>
             <template v-if="mode==='tools'"><label class="field-label">想做什么？</label><el-select v-model="operation" aria-label="常用操作" :disabled="busy" @change="resetOperation"><el-option v-for="(label,key) in operations" :key="key" :value="key" :label="label"/></el-select>

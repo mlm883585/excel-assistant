@@ -13,6 +13,7 @@ _lock = threading.RLock()
 _environment = None
 _previews = None
 _scheduler = None
+_app_version = ""
 
 
 def services():
@@ -187,6 +188,51 @@ def settings_save(base_url: str, model: str, fallback_base_url: str = '', fallba
     config_path().parent.mkdir(parents=True, exist_ok=True)
     config_path().write_text(json.dumps(config, ensure_ascii=False), encoding="utf-8")
     return True
+
+
+def set_app_version(version):
+    global _app_version
+    _app_version = version or ""
+
+
+def update_config_path():
+    return data_root() / "update.json"
+
+
+def _read_update_config():
+    path = update_config_path()
+    if not path.exists():
+        return {}
+    try:
+        return json.loads(path.read_text(encoding='utf-8'))
+    except (ValueError, OSError):
+        return {}
+
+
+@api_method("update.get")
+def update_get():
+    raw = _read_update_config()
+    return {'version': _app_version, 'base_url': raw.get('base_url', ''), 'enabled': raw.get('enabled', True)}
+
+
+@api_method("update.save")
+@guarded
+def update_save(base_url: str, enabled: bool = True):
+    from assistant.update_service import validate_update_url
+    base_url = validate_update_url(base_url)
+    update_config_path().parent.mkdir(parents=True, exist_ok=True)
+    update_config_path().write_text(json.dumps({'base_url': base_url, 'enabled': bool(enabled)}, ensure_ascii=False), encoding='utf-8')
+    return True
+
+
+@api_method("update.check")
+@guarded
+def update_check():
+    from assistant.update_service import check_update, resolve_base_url
+    raw = _read_update_config()
+    if raw.get('enabled') is False:
+        return {'update_available': False, 'current_version': _app_version, 'reason': '已停用更新检查'}
+    return check_update(resolve_base_url(raw.get('base_url', '')), _app_version)
 
 
 @api_method("tasks.agent")
