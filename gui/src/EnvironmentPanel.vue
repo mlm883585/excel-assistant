@@ -2,11 +2,11 @@
 import { ref, watch } from 'vue'
 import { ElMessage, ElMessageBox, ElDrawer, ElEmpty } from 'element-plus'
 import { ppx } from 'ppx-js'
-import { checks, candidates, message, pending, runId, kind, selectedId, initialized, messageType, modelStatus, excelStatus, type Candidate } from './environmentState'
+import { checks, candidates, message, pending, runId, kind, selectedId, initialized, messageType, modelStatus, excelStatus, modelList, type Candidate } from './environmentState'
 
 const props = defineProps<{ modelValue: boolean; busy: boolean }>()
 const emit = defineEmits(['update:modelValue', 'updated'])
-const tab = ref('overview'), settings = ref({base_url:'', model:''})
+const tab = ref('overview'), settings = ref({base_url:'', model:'', fallback_base_url:'', fallback_model:'', agent_backend:'native'})
 const states: Record<string, string> = { pass: '通过', warn: '需留意', fail: '未通过', cancelled: '已取消', untested: '未检测' }
 const call = <T=any>(method: string, params: unknown = {}) => ppx.call<T>(method, params, { timeoutMs: 60000 })
 
@@ -28,6 +28,7 @@ async function waitFor(start: { run_id: string }, type: string) {
       if (result.candidates) candidates.value = result.candidates
       if (result.selected) selectedId.value = result.selected.id
       if (type === 'model') modelStatus.value = states[result.status] || result.status
+      if (type === 'model' && Array.isArray(result.models)) modelList.value = result.models
       if (type === 'excel') excelStatus.value = states[result.status] || result.status
       if (result.attempts?.length) message.value += '；' + result.attempts.map((a: any) => a.message).join('；')
       return result
@@ -35,13 +36,14 @@ async function waitFor(start: { run_id: string }, type: string) {
     await new Promise(resolve => setTimeout(resolve, 500))
   }
 }
-async function check(type: string) { await waitFor(await call('diagnostics.check', { kind: type }), type) }
+async function check(type: string, config?: unknown) { await waitFor(await call('diagnostics.check', { kind: type, ...(config ? { config } : {}) }), type) }
 async function refresh() {
   await check('local')
   candidates.value = await call('runtime.discover')
   const status = await call('runtime.status')
   selectedId.value = status.selected?.id || ''
-  settings.value = await call('settings.get')
+  const got = await call('settings.get')
+  settings.value = { base_url: got.base_url || '', model: got.model || '', fallback_base_url: got.fallback?.base_url || '', fallback_model: got.fallback?.model || '', agent_backend: got.agent_backend || 'native' }
   initialized.value = true
 }
 async function useCandidate(candidate: Candidate) {
@@ -62,8 +64,8 @@ watch(() => props.modelValue, value => { if (value && !initialized.value) void p
   <el-drawer :model-value="modelValue" title="设置与环境" size="min(1050px, 96vw)" @update:model-value="emit('update:modelValue', $event)">
     <p>优先复用已验证的 Qwen Code。模型或 Excel 不可用时，仍可使用不依赖它们的常用操作。</p>
     <el-tabs v-model="tab"><el-tab-pane label="使用状态" name="overview"/><el-tab-pane label="模型连接" name="model"/><el-tab-pane label="高级诊断" name="advanced"/></el-tabs>
-    <div v-if="tab==='overview'" class="metrics"><div><span>常用数据操作</span><strong>{{checks.some(c=>c.status==='fail')?'请查看本机检查':'不依赖模型'}}</strong></div><div><span>智能处理运行环境</span><strong>{{selectedId?'已验证':'待配置'}}</strong></div><div><span>模型连接</span><strong>{{modelStatus}}</strong></div><div><span>Excel 启动测试</span><strong>{{excelStatus}}</strong></div></div>
-    <div v-if="tab==='model'" class="model-settings"><label class="field-label">内网模型服务地址</label><el-input v-model="settings.base_url" aria-label="模型服务地址"/><label class="field-label">模型标识</label><el-input v-model="settings.model" aria-label="模型标识"/><p class="muted">认证密钥由 IT 通过 EXCEL_ASSISTANT_API_KEY 环境变量配置。保存连接信息不代表模型可用，请单独测试。</p><el-button class="execute" :disabled="pending || busy" type="primary" @click="perform(async()=>{await call('settings.save',settings);modelStatus='未检测';message='模型设置已保存'})">保存模型设置</el-button></div>
+    <div v-if="tab==='overview'" class="metrics"><div><span>常用数据操作</span><strong>{{checks.some(c=>c.status==='fail')?'请查看本机检查':'不依赖模型'}}</strong></div><div><span>智能处理后端</span><strong>{{settings.agent_backend==='qwen' ? (selectedId?'已验证':'待配置') : '原生直连'}}</strong></div><div><span>模型连接</span><strong>{{modelStatus}}</strong></div><div><span>Excel 启动测试</span><strong>{{excelStatus}}</strong></div></div>
+    <div v-if="tab==='model'" class="model-settings"><label class="field-label">主模型服务地址</label><el-input v-model="settings.base_url" aria-label="主模型服务地址" placeholder="http://内网地址:端口/v1"/><label class="field-label">主模型标识</label><el-select v-model="settings.model" filterable allow-create default-first-option aria-label="主模型标识" placeholder="输入或从列表选择"><el-option v-for="m in modelList" :key="m" :value="m" :label="m"/></el-select><el-button :disabled="pending || busy" @click="perform(() => check('model', {base_url: settings.base_url, model: settings.model}))">检测并列出模型</el-button><label class="field-label">备用服务地址（可选）</label><el-input v-model="settings.fallback_base_url" aria-label="备用服务地址" placeholder="主服务不可用时自动降级"/><label class="field-label">备用模型标识</label><el-select v-model="settings.fallback_model" filterable allow-create default-first-option aria-label="备用模型标识" placeholder="输入或从列表选择"><el-option v-for="m in modelList" :key="m" :value="m" :label="m"/></el-select><label class="field-label">智能处理后端</label><el-radio-group v-model="settings.agent_backend" :disabled="pending || busy"><el-radio-button value="native">原生直连（推荐）</el-radio-button><el-radio-button value="qwen">Qwen Code</el-radio-button></el-radio-group><p class="muted">原生直连只需模型端点，无需安装 Node / Qwen Code CLI；Qwen Code 作为可选后端保留。</p><p class="muted">密钥由 IT 通过 EXCEL_ASSISTANT_API_KEY（备用 EXCEL_ASSISTANT_FALLBACK_API_KEY，缺省沿用主密钥）配置。保存不代表模型可用，请单独检测。</p><el-button class="execute" :disabled="pending || busy" type="primary" @click="perform(async()=>{await call('settings.save',settings);modelStatus='未检测';message='模型设置已保存'})">保存模型设置</el-button></div>
     <div class="environment-actions">
       <el-button :disabled="pending" @click="perform(refresh)">重新检测本机环境</el-button>
       <el-button :disabled="pending" @click="perform(() => check('model'))">测试已保存的模型连接</el-button>
@@ -90,7 +92,7 @@ watch(() => props.modelValue, value => { if (value && !initialized.value) void p
     </div>
     <p class="muted">完整 Agent 检测最多 90 秒，只使用本地合成数据；不代表客户模型业务能力已验收。</p>
     <el-button :disabled="pending || busy" @click="perform(install)">安装随包 WebView2</el-button>
-    </template><el-button v-if="tab==='overview' && !selectedId" type="primary" @click="tab='advanced'">配置智能处理运行环境</el-button>
+    </template><el-button v-if="tab==='overview' && !selectedId && settings.agent_backend==='qwen'" type="primary" @click="tab='advanced'">配置智能处理运行环境</el-button>
   </el-drawer>
 </template>
 

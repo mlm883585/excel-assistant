@@ -6,4 +6,4 @@ export type Candidate = { id: string; source: string; cli: string; node_executab
 export const checks = ref<Check[]>([]), candidates = ref<Candidate[]>([]), message = ref('')
 export const pending = ref(false), runId = ref(''), kind = ref(''), selectedId = ref(''), initialized = ref(false)
 export const messageType = ref<'success' | 'warning' | 'error' | 'info'>('info')
-export const modelStatus = ref('未检测'), excelStatus = ref('未检测')
+export const modelStatus = ref('未检测'), excelStatus = ref('未检测'), modelList = ref<string[]>([])

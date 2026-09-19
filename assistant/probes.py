@@ -16,34 +16,21 @@ class ProbeFailure(Exception):
 
 
 def model_probe(config):
-    import httpx
-    from urllib.parse import urlparse
-    base = config.get('base_url', '').rstrip('/')
-    parsed = urlparse(base)
-    if parsed.scheme not in {'http', 'https'} or not parsed.hostname or not config.get('model'):
-        return {'status': 'fail', 'code': 'not_configured', 'message': '请先保存内网模型地址和 model 标识'}
-    if parsed.username or parsed.password or parsed.query or parsed.fragment:
-        return {'status': 'fail', 'code': 'invalid_url', 'message': '模型地址不能包含账户信息、查询参数或片段'}
+    from .model_registry import validate_base_url, list_models, probe as registry_probe
     try:
-        with httpx.Client(timeout=10, trust_env=False, follow_redirects=False) as client:
-            response = client.post(base + '/chat/completions', headers={'Authorization': 'Bearer ' + os.environ.get('EXCEL_ASSISTANT_API_KEY', 'EMPTY')},
-                                   json={'model': config['model'], 'messages': [{'role': 'user', 'content': 'Reply OK.'}], 'max_tokens': 8, 'stream': False})
-        if response.status_code in {401, 403}:
-            return {'status': 'fail', 'code': 'authentication', 'message': '认证失败，请由 IT 核对密钥及访问权限'}
-        if response.status_code == 404:
-            return {'status': 'fail', 'code': 'model_or_endpoint', 'message': '模型或接口不存在，请核对地址和 model 标识'}
-        if not 200 <= response.status_code < 300:
-            return {'status': 'fail', 'code': f'http_{response.status_code}', 'message': f'模型服务返回 HTTP {response.status_code}；请核对服务协议与模型配置'}
-        body = response.json()
-        if not isinstance(body.get('choices'), list) or not body['choices'] or 'message' not in body['choices'][0]:
-            raise ValueError('invalid response')
-        return {'status': 'pass', 'message': '模型最小请求通过；工具调用能力仍需业务验收', 'code': 'connected'}
-    except httpx.TimeoutException:
-        return {'status': 'fail', 'code': 'timeout', 'message': '模型响应超时'}
-    except httpx.TransportError:
-        return {'status': 'fail', 'code': 'network', 'message': '模型连接或 TLS 验证失败，请检查内网服务、证书与防火墙'}
-    except (ValueError, KeyError, TypeError):
-        return {'status': 'fail', 'code': 'protocol', 'message': '返回内容不是支持的 Chat Completions 格式'}
+        base = validate_base_url(config.get('base_url', ''))
+    except ValueError as exc:
+        return {'status': 'fail', 'code': 'invalid_url', 'message': str(exc), 'models': []}
+    key = os.environ.get('EXCEL_ASSISTANT_API_KEY', 'EMPTY')
+    if not config.get('model'):
+        listing = list_models(base, key)
+        return {'status': 'pass' if listing['ok'] else 'fail',
+                'code': 'connected' if listing['ok'] else 'network',
+                'message': ('已列出 ' + str(len(listing['models'])) + ' 个模型，请选择 model 标识并保存' if listing['ok'] else listing['error']),
+                'models': listing['models']}
+    result = {'models': list_models(base, key)['models']}
+    result.update(registry_probe(base, config['model'], key))
+    return result
 
 
 def excel_probe(folder):
