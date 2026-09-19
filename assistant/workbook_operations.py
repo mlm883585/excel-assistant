@@ -1,7 +1,7 @@
 import copy
 import json
 
-from .workbook_model import blank_workbook, blank_sheet, identifier, get_sheet, validate_snapshot, validate_style, validate_range, invalidate_formulas, MAX_CELLS
+from .workbook_model import blank_workbook, blank_sheet, identifier, get_sheet, validate_snapshot, validate_style, validate_range, invalidate_formulas, formula_issue, MAX_CELLS
 from .workbooks import Workbooks
 
 
@@ -79,8 +79,30 @@ def edit_workbook(book, selected_sheet, params):
                         target['cells'][key] = {**before, 'style': {**before.get('style', {}), **edit['style']}}
             target['row_count'] = max(target['row_count'], area['r1']+1)
             target['column_count'] = max(target['column_count'], area['c1']+1)
+        elif kind == 'set_formula' and not set(edit) - {'kind', 'sheet_id', 'range', 'formulas'}:
+            area = edit['range']; validate_range(area)
+            height, width = area['r1']-area['r0']+1, area['c1']-area['c0']+1
+            if height * width > MAX_CELLS:
+                raise ValueError('编辑区域超出 200000 个单元格容量')
+            formulas = edit['formulas']
+            if not isinstance(formulas, list) or len(formulas) != height or any(not isinstance(row, list) or len(row) != width for row in formulas):
+                raise ValueError('公式矩阵尺寸须与选区一致')
+            for r in range(area['r0'], area['r1'] + 1):
+                for c in range(area['c0'], area['c1'] + 1):
+                    key = f'{r},{c}'
+                    formula = formulas[r-area['r0']][c-area['c0']]
+                    before = target['cells'].get(key, {})
+                    if formula in (None, ''):
+                        target['cells'].pop(key, None)
+                        continue
+                    issue = formula_issue(formula)
+                    if issue:
+                        raise ValueError(issue)
+                    target['cells'][key] = {'formula': formula, 'value': None, 'result_state': 'pending', **({'style': before['style']} if before.get('style') else {})}
+            target['row_count'] = max(target['row_count'], area['r1']+1)
+            target['column_count'] = max(target['column_count'], area['c1']+1)
         else:
-            raise ValueError('编辑只允许 set_values/set_style/add_sheet/rename_sheet')
+            raise ValueError('编辑只允许 set_values/set_style/set_formula/add_sheet/rename_sheet')
         validate_snapshot(result)
     invalidate_formulas(result)
     validate_snapshot(result)
@@ -98,7 +120,7 @@ def run_workbook_operation(store, task, op):
             raise ValueError('编辑目标与用户当前工作簿、版本或工作表不一致')
         allowed = scope.get('range') if scope else selection.range
         for edit in op.params.get('edits', []):
-            if edit.get('kind') in {'set_values', 'set_style'}:
+            if edit.get('kind') in {'set_values', 'set_style', 'set_formula'}:
                 if edit.get('sheet_id', selection.sheet_id) != selection.sheet_id:
                     raise ValueError('编辑不能跨出用户选择的工作表')
                 area = edit.get('range'); validate_range(area)

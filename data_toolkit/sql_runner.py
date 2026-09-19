@@ -175,7 +175,10 @@ def bind_named_parameters(
 
 def run_query(tables: Mapping[str, pd.DataFrame], query: str) -> pd.DataFrame:
     statement = validate_readonly_sql(query)
-    import duckdb
+    try:
+        import duckdb
+    except ImportError as exc:
+        raise ToolkitError("SQL 关联需要安装 duckdb 依赖档（数据分析扩展）") from exc
 
     connection = duckdb.connect(database=":memory:", config={"enable_external_access": "false"})
     try:
@@ -190,3 +193,28 @@ def run_query(tables: Mapping[str, pd.DataFrame], query: str) -> pd.DataFrame:
         raise ToolkitError(f"SQL 执行失败: {exc}") from exc
     finally:
         connection.close()
+
+
+def coerce_numeric_columns(frame: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy with unambiguous numeric string columns cast to numbers,
+    protecting leading-zero codes. Lets SQL aggregation (SUM/AVG) work over
+    text-typed frames without manual CAST."""
+    from pandas.api.types import is_numeric_dtype, is_datetime64_any_dtype
+
+    result = frame.copy()
+    for col in result.columns:
+        if str(col).startswith('__source_'):
+            continue
+        series = result[col]
+        if is_numeric_dtype(series) or is_datetime64_any_dtype(series):
+            continue
+        values = series.dropna().astype(str).str.strip()
+        non_empty = values[values != '']
+        if non_empty.empty:
+            continue
+        if any(len(v) > 1 and v[0] == '0' and v[1] != '.' for v in non_empty):
+            continue  # preserve leading-zero codes
+        coerced = pd.to_numeric(non_empty, errors='coerce')
+        if coerced.notna().all():
+            result[col] = pd.to_numeric(series, errors='coerce')
+    return result
