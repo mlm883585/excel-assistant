@@ -1,0 +1,879 @@
+[
+  {
+    "name": "altgraph",
+    "version": "0.17.5",
+    "license": "MIT",
+    "source": "offline/wheels/altgraph-0.17.5-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/altgraph-0.17.5/LICENSE"
+    ]
+  },
+  {
+    "name": "annotated-types",
+    "version": "0.8.0",
+    "license": "MIT",
+    "source": "offline/wheels/annotated_types-0.8.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/annotated-types-0.8.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "anthropic",
+    "version": "1.6.0",
+    "license": "MIT",
+    "source": "offline/wheels/anthropic-1.6.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/anthropic-1.6.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "anyio",
+    "version": "4.15.1",
+    "license": "MIT",
+    "source": "offline/wheels/anyio-4.15.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/anyio-4.15.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "attrs",
+    "version": "26.1.0",
+    "license": "MIT",
+    "source": "offline/wheels/attrs-26.1.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/attrs-26.1.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "bottle",
+    "version": "0.13.4",
+    "license": "MIT",
+    "source": "offline/wheels/bottle-0.13.4-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/bottle-0.13.4/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "certifi",
+    "version": "2026.7.22",
+    "license": "MPL-2.0",
+    "source": "offline/wheels/certifi-2026.7.22-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/certifi-2026.7.22/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "cffi",
+    "version": "2.1.1",
+    "license": "MIT-0",
+    "source": "offline/wheels/cffi-2.1.1-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/cffi-2.1.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "charset-normalizer",
+    "version": "3.5.1",
+    "license": "MIT",
+    "source": "offline/wheels/charset_normalizer-3.5.1-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/charset-normalizer-3.5.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "click",
+    "version": "8.5.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/click-8.5.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/click-8.5.0/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "clr_loader",
+    "version": "0.3.1",
+    "license": "",
+    "source": "offline/wheels/clr_loader-0.3.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/clr_loader-0.3.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "colorama",
+    "version": "0.4.6",
+    "license": "",
+    "source": "offline/wheels/colorama-0.4.6-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/colorama-0.4.6/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "contourpy",
+    "version": "1.4.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/contourpy-1.4.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/contourpy-1.4.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "cryptography",
+    "version": "50.0.1",
+    "license": "Apache-2.0 OR BSD-3-Clause",
+    "source": "offline/wheels/cryptography-50.0.1-cp311-abi3-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/cryptography-50.0.1/licenses/LICENSE",
+      "vendor/licenses/python/cryptography-50.0.1/licenses/LICENSE.APACHE",
+      "vendor/licenses/python/cryptography-50.0.1/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "name": "cycler",
+    "version": "0.12.1",
+    "license": "Copyright (c) 2015, matplotlib project",
+    "source": "offline/wheels/cycler-0.12.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/cycler-0.12.1/LICENSE"
+    ]
+  },
+  {
+    "name": "dnspython",
+    "version": "2.8.0",
+    "license": "ISC",
+    "source": "offline/wheels/dnspython-2.8.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/dnspython-2.8.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "docstring_parser",
+    "version": "0.18.0",
+    "license": "MIT",
+    "source": "offline/wheels/docstring_parser-0.18.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/docstring_parser-0.18.0/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "duckdb",
+    "version": "1.5.5",
+    "license": "",
+    "source": "offline/wheels/duckdb-1.5.5-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/duckdb-1.5.5/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "et_xmlfile",
+    "version": "2.0.0",
+    "license": "MIT",
+    "source": "offline/wheels/et_xmlfile-2.0.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/et_xmlfile-2.0.0/LICENCE.python",
+      "vendor/licenses/python/et_xmlfile-2.0.0/LICENCE.rst"
+    ]
+  },
+  {
+    "name": "fonttools",
+    "version": "4.65.0",
+    "license": "MIT",
+    "source": "offline/wheels/fonttools-4.65.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/fonttools-4.65.0/licenses/LICENSE",
+      "vendor/licenses/python/fonttools-4.65.0/licenses/LICENSE.external"
+    ]
+  },
+  {
+    "name": "greenlet",
+    "version": "3.5.6",
+    "license": "MIT AND PSF-2.0",
+    "source": "offline/wheels/greenlet-3.5.6-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/greenlet-3.5.6/licenses/LICENSE",
+      "vendor/licenses/python/greenlet-3.5.6/licenses/LICENSE.PSF"
+    ]
+  },
+  {
+    "name": "h11",
+    "version": "0.16.0",
+    "license": "MIT",
+    "source": "offline/wheels/h11-0.16.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/h11-0.16.0/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "httpcore",
+    "version": "1.0.9",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/httpcore-1.0.9-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/httpcore-1.0.9/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpcore2",
+    "version": "2.13.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/httpcore2-2.13.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/httpcore2-2.13.0/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpx",
+    "version": "0.28.1",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/httpx-0.28.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/httpx-0.28.1/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpx2",
+    "version": "2.13.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/httpx2-2.13.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/httpx2-2.13.0/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "httpx-sse",
+    "version": "0.4.3",
+    "license": "MIT",
+    "source": "offline/wheels/httpx_sse-0.4.3-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/httpx-sse-0.4.3/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "idna",
+    "version": "3.19",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/idna-3.19-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/idna-3.19/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "jiter",
+    "version": "0.17.0",
+    "license": "MIT",
+    "source": "offline/wheels/jiter-0.17.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/jiter-0.17.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "jsonschema",
+    "version": "4.26.0",
+    "license": "MIT",
+    "source": "offline/wheels/jsonschema-4.26.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/jsonschema-4.26.0/licenses/COPYING"
+    ]
+  },
+  {
+    "name": "jsonschema-specifications",
+    "version": "2025.9.1",
+    "license": "MIT",
+    "source": "offline/wheels/jsonschema_specifications-2025.9.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/jsonschema-specifications-2025.9.1/licenses/COPYING"
+    ]
+  },
+  {
+    "name": "kiwisolver",
+    "version": "1.5.1",
+    "license": "=========================",
+    "source": "offline/wheels/kiwisolver-1.5.1-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/kiwisolver-1.5.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "lxml",
+    "version": "6.1.3",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/lxml-6.1.3-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/lxml-6.1.3/licenses/LICENSE.txt",
+      "vendor/licenses/python/lxml-6.1.3/licenses/LICENSES.txt"
+    ]
+  },
+  {
+    "name": "matplotlib",
+    "version": "3.11.2",
+    "license": "License agreement for matplotlib versions 1.3.0 and later",
+    "source": "offline/wheels/matplotlib-3.11.2-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/matplotlib-3.11.2/LICENSE"
+    ]
+  },
+  {
+    "name": "mcp",
+    "version": "1.30.0",
+    "license": "MIT",
+    "source": "offline/wheels/mcp-1.30.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/mcp-1.30.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "mypy_extensions",
+    "version": "1.1.0",
+    "license": "MIT",
+    "source": "offline/wheels/mypy_extensions-1.1.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/mypy_extensions-1.1.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "numpy",
+    "version": "2.5.3",
+    "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+    "source": "offline/wheels/numpy-2.5.3-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/numpy-2.5.3/licenses/LICENSE.txt",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/ma/LICENSE",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/distributions/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/philox/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/random/src/splitmix64/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/src/highway/LICENSE",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "vendor/licenses/python/numpy-2.5.3/licenses/numpy/_core/src/umath/svml/LICENSE"
+    ]
+  },
+  {
+    "name": "openai",
+    "version": "3.14.1",
+    "license": "Apache-2.0",
+    "source": "offline/wheels/openai-3.14.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/openai-3.14.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "openpyxl",
+    "version": "3.1.5",
+    "license": "MIT",
+    "source": "offline/wheels/openpyxl-3.1.5-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/openpyxl-3.1.5/LICENCE.rst"
+    ]
+  },
+  {
+    "name": "orjson",
+    "version": "3.12.0",
+    "license": "MPL-2.0 AND (Apache-2.0 OR MIT)",
+    "source": "offline/wheels/orjson-3.12.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/orjson-3.12.0/licenses/LICENSE-APACHE",
+      "vendor/licenses/python/orjson-3.12.0/licenses/LICENSE-MIT",
+      "vendor/licenses/python/orjson-3.12.0/licenses/LICENSE-MPL-2.0"
+    ]
+  },
+  {
+    "name": "packaging",
+    "version": "26.3",
+    "license": "Apache-2.0 OR BSD-2-Clause",
+    "source": "offline/wheels/packaging-26.3-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/packaging-26.3/licenses/LICENSE",
+      "vendor/licenses/python/packaging-26.3/licenses/LICENSE.APACHE",
+      "vendor/licenses/python/packaging-26.3/licenses/LICENSE.BSD"
+    ]
+  },
+  {
+    "name": "pandas",
+    "version": "3.0.5",
+    "license": "BSD 3-Clause License",
+    "source": "offline/wheels/pandas-3.0.5-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pandas-3.0.5/LICENSE"
+    ]
+  },
+  {
+    "name": "pandera",
+    "version": "0.33.1",
+    "license": "MIT License",
+    "source": "offline/wheels/pandera-0.33.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pandera-0.33.1/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pefile",
+    "version": "2024.8.26",
+    "license": "MIT",
+    "source": "offline/wheels/pefile-2024.8.26-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pefile-2024.8.26/LICENSE"
+    ]
+  },
+  {
+    "name": "pillow",
+    "version": "12.3.0",
+    "license": "MIT-CMU",
+    "source": "offline/wheels/pillow-12.3.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pillow-12.3.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "polars",
+    "version": "1.44.2",
+    "license": "Copyright (c) 2025 Ritchie Vink",
+    "source": "offline/wheels/polars-1.44.2-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/polars-1.44.2/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "polars-runtime-32",
+    "version": "1.44.2",
+    "license": "MIT",
+    "source": "offline/wheels/polars_runtime_32-1.44.2-cp310-abi3-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/polars-runtime-32-1.44.2/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "proxy_tools",
+    "version": "0.1.0",
+    "license": "MIT",
+    "source": "offline/wheels/proxy_tools-0.1.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/proxy_tools-0.1.0/LICENSE-UPSTREAM.txt"
+    ]
+  },
+  {
+    "name": "psutil",
+    "version": "7.2.2",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/psutil-7.2.2-cp37-abi3-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/psutil-7.2.2/LICENSE"
+    ]
+  },
+  {
+    "name": "psycopg2-binary",
+    "version": "2.9.13",
+    "license": "LGPL with exceptions",
+    "source": "offline/wheels/psycopg2_binary-2.9.13-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/psycopg2-binary-2.9.13/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pycparser",
+    "version": "3.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/pycparser-3.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pycparser-3.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic",
+    "version": "2.13.5",
+    "license": "MIT",
+    "source": "offline/wheels/pydantic-2.13.5-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pydantic-2.13.5/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic_core",
+    "version": "2.46.5",
+    "license": "MIT",
+    "source": "offline/wheels/pydantic_core-2.46.5-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pydantic_core-2.46.5/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pydantic-settings",
+    "version": "2.15.0",
+    "license": "MIT",
+    "source": "offline/wheels/pydantic_settings-2.15.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pydantic-settings-2.15.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pyinstaller",
+    "version": "6.22.2",
+    "license": "GPLv2-or-later with a special exception which allows to use PyInstaller to build and distribute non-free programs (including commercial ones)",
+    "source": "offline/wheels/pyinstaller-6.22.2-py3-none-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pyinstaller-6.22.2/licenses/COPYING.txt"
+    ]
+  },
+  {
+    "name": "pyinstaller-hooks-contrib",
+    "version": "2026.7",
+    "license": "",
+    "source": "offline/wheels/pyinstaller_hooks_contrib-2026.7-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pyinstaller-hooks-contrib-2026.7/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "PyJWT",
+    "version": "2.14.0",
+    "license": "MIT",
+    "source": "offline/wheels/pyjwt-2.14.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/PyJWT-2.14.0/licenses/AUTHORS.rst",
+      "vendor/licenses/python/PyJWT-2.14.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pymongo",
+    "version": "4.18.1",
+    "license": "Apache-2.0",
+    "source": "offline/wheels/pymongo-4.18.1-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pymongo-4.18.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "PyMySQL",
+    "version": "1.2.3",
+    "license": "MIT",
+    "source": "offline/wheels/pymysql-1.2.3-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/PyMySQL-1.2.3/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pyodbc",
+    "version": "5.3.0",
+    "license": "MIT",
+    "source": "offline/wheels/pyodbc-5.3.0-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pyodbc-5.3.0/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pyparsing",
+    "version": "3.3.2",
+    "license": "MIT",
+    "source": "offline/wheels/pyparsing-3.3.2-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pyparsing-3.3.2/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pypdf",
+    "version": "6.19.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/pypdf-6.19.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pypdf-6.19.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "python-calamine",
+    "version": "0.8.2",
+    "license": "MIT",
+    "source": "offline/wheels/python_calamine-0.8.2-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/python-calamine-0.8.2/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "python-dateutil",
+    "version": "2.9.0.post0",
+    "license": "Dual License",
+    "source": "offline/wheels/python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/python-dateutil-2.9.0.post0/LICENSE"
+    ]
+  },
+  {
+    "name": "python-docx",
+    "version": "1.2.0",
+    "license": "MIT",
+    "source": "offline/wheels/python_docx-1.2.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/python-docx-1.2.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "python-dotenv",
+    "version": "1.2.3",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/python_dotenv-1.2.3-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/python-dotenv-1.2.3/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "python-multipart",
+    "version": "0.0.32",
+    "license": "Apache-2.0",
+    "source": "offline/wheels/python_multipart-0.0.32-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/python-multipart-0.0.32/licenses/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "pythonnet",
+    "version": "3.1.0",
+    "license": "MIT",
+    "source": "offline/wheels/pythonnet-3.1.0-cp310.cp311.cp312.cp313.cp314-none-win32.win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pythonnet-3.1.0/licenses/AUTHORS.md",
+      "vendor/licenses/python/pythonnet-3.1.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pywebview",
+    "version": "6.2.1",
+    "license": "BSD 3-Clause License",
+    "source": "offline/wheels/pywebview-6.2.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pywebview-6.2.1/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "pywin32",
+    "version": "312",
+    "license": "PSF",
+    "source": "offline/wheels/pywin32-312-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/pywin32-312/licenses/adodbapi/license.txt",
+      "vendor/licenses/python/pywin32-312/licenses/com/License.txt",
+      "vendor/licenses/python/pywin32-312/licenses/com/win32comext/mapi/src/MAPIStubLibrary/LICENSE",
+      "vendor/licenses/python/pywin32-312/licenses/isapi/README.txt",
+      "vendor/licenses/python/pywin32-312/licenses/pythonwin/License.txt",
+      "vendor/licenses/python/pywin32-312/licenses/pythonwin/Scintilla/License.txt",
+      "vendor/licenses/python/pywin32-312/licenses/pythonwin/pywin/idle/LICENSE.txt",
+      "vendor/licenses/python/pywin32-312/licenses/win32/License.txt"
+    ]
+  },
+  {
+    "name": "pywin32-ctypes",
+    "version": "0.2.3",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/pywin32_ctypes-0.2.3-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/pywin32-ctypes-0.2.3/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "PyYAML",
+    "version": "6.0.3",
+    "license": "MIT",
+    "source": "offline/wheels/pyyaml-6.0.3-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/PyYAML-6.0.3/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "qwen-code-sdk",
+    "version": "0.1.0",
+    "license": "Apache-2.0",
+    "source": "offline/wheels/qwen_code_sdk-0.1.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/qwen-code-sdk-0.1.0/LICENSE-UPSTREAM.txt"
+    ]
+  },
+  {
+    "name": "RapidFuzz",
+    "version": "3.14.6",
+    "license": "MIT",
+    "source": "offline/wheels/rapidfuzz-3.14.6-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/RapidFuzz-3.14.6/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "referencing",
+    "version": "0.37.0",
+    "license": "MIT",
+    "source": "offline/wheels/referencing-0.37.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/referencing-0.37.0/licenses/COPYING"
+    ]
+  },
+  {
+    "name": "rpds-py",
+    "version": "2026.6.3",
+    "license": "MIT",
+    "source": "offline/wheels/rpds_py-2026.6.3-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/rpds-py-2026.6.3/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "scipy",
+    "version": "1.18.1",
+    "license": "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.",
+    "source": "offline/wheels/scipy-1.18.1-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/scipy-1.18.1/LICENSE.txt"
+    ]
+  },
+  {
+    "name": "setuptools",
+    "version": "84.0.0",
+    "license": "MIT",
+    "source": "offline/wheels/setuptools-84.0.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/setuptools-84.0.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license": "MIT",
+    "source": "offline/wheels/six-1.17.0-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/six-1.17.0/LICENSE"
+    ]
+  },
+  {
+    "name": "sniffio",
+    "version": "1.3.1",
+    "license": "MIT OR Apache-2.0",
+    "source": "offline/wheels/sniffio-1.3.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/sniffio-1.3.1/LICENSE",
+      "vendor/licenses/python/sniffio-1.3.1/LICENSE.APACHE2",
+      "vendor/licenses/python/sniffio-1.3.1/LICENSE.MIT"
+    ]
+  },
+  {
+    "name": "SQLAlchemy",
+    "version": "2.0.54",
+    "license": "MIT",
+    "source": "offline/wheels/sqlalchemy-2.0.54-cp313-cp313-win_amd64.whl",
+    "files": [
+      "vendor/licenses/python/SQLAlchemy-2.0.54/licenses/AUTHORS",
+      "vendor/licenses/python/SQLAlchemy-2.0.54/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "sse-starlette",
+    "version": "3.4.11",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/sse_starlette-3.4.11-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/sse-starlette-3.4.11/licenses/AUTHORS",
+      "vendor/licenses/python/sse-starlette-3.4.11/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "starlette",
+    "version": "1.6.0",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/starlette-1.6.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/starlette-1.6.0/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "tqdm",
+    "version": "4.70.1",
+    "license": "MPL-2.0 AND MIT",
+    "source": "offline/wheels/tqdm-4.70.1-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/tqdm-4.70.1/licenses/LICENCE"
+    ]
+  },
+  {
+    "name": "truststore",
+    "version": "0.10.4",
+    "license": "MIT",
+    "source": "offline/wheels/truststore-0.10.4-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/truststore-0.10.4/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "typeguard",
+    "version": "4.6.0",
+    "license": "MIT",
+    "source": "offline/wheels/typeguard-4.6.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/typeguard-4.6.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "typing_extensions",
+    "version": "4.16.0",
+    "license": "PSF-2.0",
+    "source": "offline/wheels/typing_extensions-4.16.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/typing_extensions-4.16.0/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "typing-inspect",
+    "version": "0.9.0",
+    "license": "MIT",
+    "source": "offline/wheels/typing_inspect-0.9.0-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/typing-inspect-0.9.0/LICENSE"
+    ]
+  },
+  {
+    "name": "typing-inspection",
+    "version": "0.4.4",
+    "license": "MIT",
+    "source": "offline/wheels/typing_inspection-0.4.4-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/typing-inspection-0.4.4/licenses/LICENSE"
+    ]
+  },
+  {
+    "name": "tzdata",
+    "version": "2026.3",
+    "license": "Apache-2.0",
+    "source": "offline/wheels/tzdata-2026.3-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/tzdata-2026.3/licenses/LICENSE",
+      "vendor/licenses/python/tzdata-2026.3/licenses/licenses/LICENSE_APACHE"
+    ]
+  },
+  {
+    "name": "uvicorn",
+    "version": "0.52.4",
+    "license": "BSD-3-Clause",
+    "source": "offline/wheels/uvicorn-0.52.4-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/uvicorn-0.52.4/licenses/LICENSE.md"
+    ]
+  },
+  {
+    "name": "xlrd",
+    "version": "2.0.2",
+    "license": "BSD",
+    "source": "offline/wheels/xlrd-2.0.2-py2.py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/xlrd-2.0.2/LICENSE"
+    ]
+  },
+  {
+    "name": "xlsxwriter",
+    "version": "3.2.9",
+    "license": "BSD-2-Clause",
+    "source": "offline/wheels/xlsxwriter-3.2.9-py3-none-any.whl",
+    "files": [
+      "vendor/licenses/python/xlsxwriter-3.2.9/LICENSE.txt"
+    ]
+  }
+]

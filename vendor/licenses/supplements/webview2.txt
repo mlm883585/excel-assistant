@@ -1,0 +1,14 @@
+Microsoft Edge WebView2 Runtime
+
+The portable application ships with the WebView2 Evergreen Standalone Installer
+(prerequisites/WebView2StandaloneX64.exe) to provision the WebView2 Runtime on
+offline intranet machines. This is Microsoft's official redistributable installer;
+its license terms are the Microsoft Software License Terms for Microsoft Edge
+WebView2 Runtime, which are displayed in the installer UI and published at:
+
+  https://learn.microsoft.com/en-us/microsoft-edge/webview2/concepts/distribution
+
+The installer binary is downloaded by scripts/fetch_webview2.ps1 and verified
+against its Authenticode signature (SignerCertificate subject "Microsoft
+Corporation") both at download time and again when attached to the portable build
+(scripts/package_media.py). No WebView2 source code is redistributed.

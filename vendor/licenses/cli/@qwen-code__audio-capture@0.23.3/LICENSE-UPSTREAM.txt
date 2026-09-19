@@ -1,0 +1,7 @@
+@qwen-code/audio-capture 0.23.3
+Source: QwenLM/qwen-code, packages/audio-capture (native microphone capture backend).
+Declared license: Apache-2.0 (same repository license as @qwen-code/qwen-code).
+
+This package is part of the Qwen Code repository and is distributed under the Apache
+License 2.0. The full text is reproduced in this repository at vendor/QWEN-LICENSE and
+shipped in the portable app as the top-level QWEN-LICENSE file.

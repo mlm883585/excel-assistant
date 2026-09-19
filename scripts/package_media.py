@@ -66,9 +66,20 @@ def package_media(root=None):
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(root / 'assets/branding' / name, target)
         updated.append(target)
-    if (root/'vendor/licenses/gui').is_dir():
-        shutil.copytree(root/'vendor/licenses/gui', destination/'licenses/gui', dirs_exist_ok=True)
-        updated.extend(p for p in (destination/'licenses/gui').rglob('*') if p.is_file())
+    # Third-party license archives: frontend npm, bundled CLI npm, and Python wheels.
+    for src_subdir, dst_subdir in [('vendor/licenses/gui', 'licenses/gui'),
+                                   ('vendor/licenses/cli', 'licenses/cli'),
+                                   ('vendor/licenses/python', 'licenses/python')]:
+        if (root/src_subdir).is_dir():
+            shutil.copytree(root/src_subdir, destination/dst_subdir, dirs_exist_ok=True)
+            updated.extend(p for p in (destination/dst_subdir).rglob('*') if p.is_file())
+    # WebView2 Runtime is redistributed under Microsoft's installer EULA; ship a notice.
+    webview2_notice = root/'vendor/licenses/supplements/webview2.txt'
+    if webview2_notice.is_file():
+        notice_target = destination/'licenses/webview2/NOTICE.txt'
+        notice_target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(webview2_notice, notice_target)
+        updated.append(notice_target)
     source_archive=destination/'corresponding-source.zip'
     write_source_archive(root,source_archive)
     updated.append(source_archive)

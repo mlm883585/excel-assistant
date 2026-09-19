@@ -12,10 +12,12 @@
 
 本项目按根 LICENSE 的 AGPL-3.0 提供。向客户交付时一并提供对应版本源代码、构建脚本、依赖锁文件、许可证及修改说明；不将客户数据、密钥或内部模型地址纳入源码分发。此文件是交付记录，不替代组织对分发方式的许可证适配核查。
 
-Python 第三方包许可证保留在 wheel/安装元数据中；Node 依赖保留各包许可证。正式发布需对实际交付包完成依赖清单及许可证归档。
+Python 第三方包许可证正文归档于 `vendor/licenses/python/`（由 `scripts/archive_python_licenses.py` 从 `offline/wheels/` 各 wheel 的 `.dist-info` 提取，随便携包交付到 `licenses/python/`）；Node 依赖（前端 + 随包 Qwen CLI）许可证分别归档于 `vendor/licenses/gui/` 与 `vendor/licenses/cli/`；WebView2 Runtime 随包再分发说明归档于 `licenses/webview2/NOTICE.txt`。交付包的许可证归档与依赖清单已由 `scripts/verify_release.py` 逐文件校验。
 
 2026-09-15：应用图标由本项目原创 SVG 生成，母版和派生文件位于 `assets/branding/`，按根许可证提供。PPX 默认图标、博客背景和 README 宣传图片已移除；必要技术说明、作者归属与许可证保留。桌面运行时新增可选标题和图标参数，打包规格附带相同图标供窗口使用；PPX Python 许可证改归档到交付包 `licenses/ppx/LICENSE`。初始化排除被裁剪图片，前端与 EXE 均使用自有图标。未改名或隐藏运行时的 PPX 技术来源。
 
-编辑器前端依赖的固定版本、来源与许可证正文归档于 `vendor/licenses/gui/`，由 `scripts/archive_gui_licenses.py` 从锁定的已安装运行包生成，随便携包交付。`gui/package-lock.json` 保存完整依赖图及完整性校验。
+编辑器前端依赖的固定版本、来源与许可证正文归档于 `vendor/licenses/gui/`；随包 Qwen Code CLI（`@qwen-code/qwen-code` 及其传递依赖）归档于 `vendor/licenses/cli/`。二者均由 `scripts/archive_gui_licenses.py` 从锁定的已安装运行包生成，随便携包交付。`gui/package-lock.json` 与根 `package-lock.json` 保存完整依赖图及完整性校验。
+
+2026-09-19：补齐交付许可证归档——新增 `scripts/archive_python_licenses.py`（Python wheel 许可证 → `licenses/python/`）、`scripts/archive_gui_licenses.py` 增补 CLI 归档（→ `licenses/cli/`）、`vendor/qwen-code-sdk/LICENSE`、WebView2 再分发说明（→ `licenses/webview2/NOTICE.txt`），并由 `verify_release.py` 逐文件校验随包许可证。DataCraft 原项目分发授权仍需发布前确认。
 
 产品交互参考 Grist（Apache-2.0）的旧值与新值并排核对、OpenRefine（BSD-3-Clause）的步骤与历史说明、Microsoft Data Formulator（MIT）的输入→操作→结果卡片；仅借鉴交互思路，未复制其源码或资产。FortuneSheet 为评估候选，未引入。FormulaAI 仅作为场景展示与确认流程参考。

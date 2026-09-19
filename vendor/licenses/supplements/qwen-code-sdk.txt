@@ -1,0 +1,9 @@
+qwen-code-sdk 0.1.0
+Source: vendor/qwen-code-sdk (a vendored, locally built wheel in this repository).
+Declared license: Apache-2.0
+
+This package is distributed under the Apache License 2.0. Its full license text is
+reproduced in this repository at vendor/QWEN-LICENSE and shipped in the portable app
+as the top-level QWEN-LICENSE file (licenses/ppx/LICENSE is the AGPL-3.0 text for PPX,
+a separate component). The SDK sources live under vendor/qwen-code-sdk/ and carry a
+copy of the Apache-2.0 text at vendor/qwen-code-sdk/LICENSE.

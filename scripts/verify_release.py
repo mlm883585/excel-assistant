@@ -50,17 +50,30 @@ def main():
             if hashlib.sha256(archive.read(name)).hexdigest() != digest(path):
                 raise ValueError(f'对应源码内容不是当前文件：{name}')
 
-    licenses = json.loads((ROOT / 'vendor/licenses/gui/manifest.json').read_text(encoding='utf-8'))
-    for package in licenses:
-        if not package['files']:
-            raise ValueError(f'运行依赖缺少许可证：{package["name"]}')
-        for name in package['files']:
-            packaged = bundle / name.removeprefix('vendor/')
-            if not packaged.is_file() or digest(ROOT / name) != digest(packaged):
-                raise ValueError(f'随包许可证缺失或不一致：{name}')
+    license_archives = []
+    total_licenses = 0
+    for src_subdir in ('vendor/licenses/gui', 'vendor/licenses/cli', 'vendor/licenses/python'):
+        manifest_file = ROOT / src_subdir / 'manifest.json'
+        if not manifest_file.is_file():
+            continue
+        entries = json.loads(manifest_file.read_text(encoding='utf-8'))
+        for package in entries:
+            if not package['files']:
+                raise ValueError(f'运行依赖缺少许可证：{package.get("name")}')
+            for name in package['files']:
+                packaged = bundle / name.removeprefix('vendor/')
+                if not packaged.is_file() or digest(ROOT / name) != digest(packaged):
+                    raise ValueError(f'随包许可证缺失或不一致：{name}')
+        license_archives.append(src_subdir.removeprefix('vendor/licenses/'))
+        total_licenses += len(entries)
+    if not license_archives:
+        raise ValueError('未找到任何许可证归档')
+    if not (bundle / 'licenses/webview2/NOTICE.txt').is_file():
+        raise ValueError('缺少 WebView2 再分发说明')
     result = {
         'passed': True, 'manifest_files': len(manifest), 'source_files': len(sources),
-        'runtime_licenses': len(licenses), 'frontend_files': len(ui_files),
+        'runtime_licenses': total_licenses, 'license_archives': license_archives,
+        'frontend_files': len(ui_files),
         'total_mib': round(sum((bundle / name).stat().st_size for name in manifest) / 1024 ** 2, 1),
         'offline_webview2_installer': (bundle / 'prerequisites/WebView2StandaloneX64.exe').is_file(),
         'branding': verify_branding(ROOT, bundle),
