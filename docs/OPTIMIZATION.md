@@ -126,6 +126,7 @@
 #### 方向 12：性能上限
 - **现状**：20 万单元格、10 万行 9.6s。
 - **目标**：DuckDB/polars 后端（已就绪）支撑百万行级；超出编辑器上限时走「流式分页 + 全量后台处理」（现有模式）。
+- **落地（2026-09-19，见 `docs/PHASE_D.md`）**：assistant 主读取路径接上引擎——xlsx 无公式时单遍读（约 1.9x），大 CSV 走 DuckDB（百万行起反超，300 万行约 2.5x），安全快速路径 + 语义等价回退。**勘误**：实际只有 `duckdb` 已安装；`polars`/`pyarrow` 未装，`engine.py`/`io.py` 里的 polars 分支仅供独立 CLI toolkit，assistant 主路径未用。预览已由 `PreviewService` 流式分页覆盖。
 - **参考**：DuckDB、Gigasheet。
 
 ---

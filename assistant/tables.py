@@ -1,7 +1,9 @@
+import codecs
 import json
 import re
 import uuid
 import time
+import zipfile
 from pathlib import Path
 
 import pandas as pd
@@ -46,6 +48,122 @@ def overview(path):
         return {"sheets": book.sheet_names, "note": "请选择工作表及实际表头行"}
 
 
+CSV_FAST_MIN_BYTES = 10 * 1024 * 1024
+
+
+def _read_csv_fast(path):
+    """DuckDB fast path for a clean, large UTF-8 CSV (header=None equivalent).
+
+    Returns an all-string DataFrame when the file is provably unambiguous
+    (UTF-8, uniform rows, no blank lines), else None so the caller falls back to
+    pandas. Preserves the pandas reader's semantics: one row per physical line,
+    empty fields as '', sequential physical line numbers for __source_row.
+    """
+    try:
+        import duckdb
+    except ImportError:
+        return None
+    try:
+        if path.stat().st_size < CSV_FAST_MIN_BYTES:
+            return None
+    except OSError:
+        return None
+    newlines = 0
+    last_byte = b""
+    decoder = codecs.getincrementaldecoder("utf-8-sig")()
+    try:
+        with open(path, "rb") as handle:
+            while True:
+                chunk = handle.read(1 << 20)
+                if not chunk:
+                    break
+                newlines += chunk.count(b"\n")
+                last_byte = chunk[-1:]
+                decoder.decode(chunk, final=False)
+            decoder.decode(b"", final=True)
+    except (UnicodeDecodeError, OSError):
+        return None
+    total_lines = newlines if last_byte == b"\n" else newlines + 1
+    try:
+        with duckdb.connect(":memory:") as con:
+            frame = con.execute(
+                "SELECT * FROM read_csv(?, header=false, all_varchar=true, delim=',', ignore_errors=false)",
+                [str(path)],
+            ).fetchdf()
+    except Exception:
+        return None
+    if len(frame) != total_lines:
+        return None  # DuckDB drops blank lines; fall back to keep line numbers exact.
+    frame.columns = range(len(frame.columns))  # match pandas header=None integer labels
+    return frame.where(pd.notna(frame), "")
+
+
+def _xlsx_has_formula(path):
+    """True if any worksheet carries a formula element, conservatively.
+
+    False only when no worksheet XML contains a (possibly namespaced) ``<f>``
+    formula tag. Any read/decode problem falls back to True.
+    """
+    try:
+        with zipfile.ZipFile(path) as archive:
+            for name in archive.namelist():
+                if name.startswith("xl/worksheets/") and name.endswith(".xml"):
+                    xml = archive.read(name).decode("utf-8", errors="strict")
+                    if re.search(r"<(?:[A-Za-z_][\w.-]*:)?f[ >/]", xml):
+                        return True
+    except (zipfile.BadZipFile, KeyError, OSError, UnicodeDecodeError):
+        return True
+    return False
+
+
+def _read_xlsx(path, selection):
+    """Read an xlsx sheet, single-pass when the workbook is formula-free."""
+    if not _xlsx_has_formula(path):
+        cached = load_workbook(path, read_only=True, data_only=True)
+        try:
+            sheet = cached.worksheets[selection.sheet] if isinstance(selection.sheet, int) else cached[selection.sheet]
+            sheet_name = sheet.title
+            rows = []
+            for value_row in sheet.iter_rows():
+                row = []
+                for cell in value_row:
+                    value = cell.value
+                    if isinstance(value, (int, float)) and re.fullmatch(r"0{2,}", cell.number_format or ""):
+                        if int(value) != value:
+                            raise ValueError(f"{sheet_name}!{cell.coordinate} 使用编号格式但值不是整数，请先确认")
+                        value = str(int(value)).zfill(len(cell.number_format))
+                    row.append("" if value is None else value)
+                rows.append(row)
+            return pd.DataFrame(rows), sheet_name
+        finally:
+            cached.close()
+    book = load_workbook(path, read_only=True, data_only=False)
+    cached = load_workbook(path, read_only=True, data_only=True)
+    try:
+        sheet = book.worksheets[selection.sheet] if isinstance(selection.sheet, int) else book[selection.sheet]
+        values = cached[sheet.title]
+        sheet_name = sheet.title
+        rows = []
+        for formula_row, value_row in zip(sheet.iter_rows(), values.iter_rows()):
+            row = []
+            for cell, cached_cell in zip(formula_row, value_row):
+                value = cell.value
+                if cell.data_type == "f":
+                    if cached_cell.value is None:
+                        raise ValueError(f"{sheet_name}!{cell.coordinate} 公式没有缓存值，请先用 Excel 重算并保存")
+                    value = cached_cell.value
+                if isinstance(value, (int, float)) and re.fullmatch(r"0{2,}", cell.number_format or ""):
+                    if int(value) != value:
+                        raise ValueError(f"{sheet_name}!{cell.coordinate} 使用编号格式但值不是整数，请先确认")
+                    value = str(int(value)).zfill(len(cell.number_format))
+                row.append("" if value is None else value)
+            rows.append(row)
+        return pd.DataFrame(rows), sheet_name
+    finally:
+        book.close()
+        cached.close()
+
+
 def read(store, task, selection: InputSelection):
     header = selection.header_row - 1
     row_offset = 0
@@ -79,37 +197,15 @@ def read(store, task, selection: InputSelection):
             rows.append(row)
         raw, sheet_name, info = pd.DataFrame(rows), candidate['name'], {**info,'validated':False}
     elif path.suffix == ".csv":
-        try:
-            raw = pd.read_csv(path, header=None, dtype=str, keep_default_na=False, encoding="utf-8-sig", skip_blank_lines=False)
-        except UnicodeDecodeError:
-            raw = pd.read_csv(path, header=None, dtype=str, keep_default_na=False, encoding="gb18030", skip_blank_lines=False)
+        raw = _read_csv_fast(path)
+        if raw is None:
+            try:
+                raw = pd.read_csv(path, header=None, dtype=str, keep_default_na=False, encoding="utf-8-sig", skip_blank_lines=False)
+            except UnicodeDecodeError:
+                raw = pd.read_csv(path, header=None, dtype=str, keep_default_na=False, encoding="gb18030", skip_blank_lines=False)
         sheet_name = "CSV"
     elif path.suffix == ".xlsx":
-        book = load_workbook(path, read_only=True, data_only=False)
-        cached = load_workbook(path, read_only=True, data_only=True)
-        try:
-            sheet = book.worksheets[selection.sheet] if isinstance(selection.sheet, int) else book[selection.sheet]
-            values = cached[sheet.title]
-            sheet_name = sheet.title
-            rows = []
-            for formula_row, value_row in zip(sheet.iter_rows(), values.iter_rows()):
-                row = []
-                for cell, cached_cell in zip(formula_row, value_row):
-                    value = cell.value
-                    if cell.data_type == "f":
-                        if cached_cell.value is None:
-                            raise ValueError(f"{sheet_name}!{cell.coordinate} 公式没有缓存值，请先用 Excel 重算并保存")
-                        value = cached_cell.value
-                    if isinstance(value, (int, float)) and re.fullmatch(r"0{2,}", cell.number_format or ""):
-                        if int(value) != value:
-                            raise ValueError(f"{sheet_name}!{cell.coordinate} 使用编号格式但值不是整数，请先确认")
-                        value = str(int(value)).zfill(len(cell.number_format))
-                    row.append("" if value is None else value)
-                rows.append(row)
-            raw = pd.DataFrame(rows)
-        finally:
-            book.close()
-            cached.close()
+        raw, sheet_name = _read_xlsx(path, selection)
     else:
         raw = pd.read_excel(path, sheet_name=selection.sheet, header=None, dtype=object, keep_default_na=False, engine="calamine")
         sheet_name = str(selection.sheet)
