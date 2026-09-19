@@ -1,0 +1,34 @@
+# 可选/未来依赖 —— 离线物料扩充清单（不进 requirements.txt / requirements.lock.txt）
+# 这些包不会默认装进应用运行时（PyInstaller 只冻结 requirements.lock.txt + 导入图），
+# 但会被 scripts/fetch_wheels.py 预置进 offline/wheels，供内网按需
+#   pip install --no-index --find-links offline/wheels <包名>
+# 零网络安装。清单是起始集，增删后运行 scripts/refresh_offline.py 即可。
+
+# —— 代码已按需引用（data_toolkit 的 polars 引擎 / MySQL / SQL Server）——
+polars
+pymysql
+pyodbc
+
+# —— 数据库 / 引擎（预期扩展）——
+sqlalchemy
+psycopg2-binary
+pymongo
+
+# —— 文档 / 导出 ——
+python-docx
+pypdf
+xlrd
+
+# —— 图表 / 统计 ——
+matplotlib
+scipy
+
+# —— AI / LLM SDK（模型端点走 OpenAI 兼容 /v1）——
+openai
+anthropic
+
+# —— 通用工具 ——
+PyYAML
+orjson
+tqdm
+charset-normalizer

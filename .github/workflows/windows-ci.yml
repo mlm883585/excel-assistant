@@ -60,6 +60,15 @@ jobs:
         if: github.event_name == 'workflow_dispatch' && inputs.build_portable
         shell: pwsh
         run: ./scripts/fetch_webview2.ps1
+      - name: Regenerate offline build kit
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/refresh_offline.py
+      - name: Verify offline kit consistency
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/check_offline.py
+      - name: Bundle offline build kit
+        if: github.event_name == 'workflow_dispatch' && inputs.build_portable
+        run: python scripts/package_offline_kit.py
       - name: Build portable application
         if: github.event_name == 'workflow_dispatch' && inputs.build_portable
         run: python scripts/build.py
@@ -80,5 +89,13 @@ jobs:
         with:
           name: ExcelAssistant-Windows-x64
           path: build/ExcelAssistant/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Retain offline build kit
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.build_portable
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ExcelAssistant-offline-build-kit
+          path: build/offline-build-kit.zip
           if-no-files-found: error
           retention-days: 14

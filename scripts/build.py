@@ -41,8 +41,13 @@ def main():
     shutil.copytree(ROOT/'build/mcp/DataCraftMCP',destination/'mcp',dirs_exist_ok=True,copy_function=copy_changed)
     shutil.copytree(ROOT/'node_modules',destination/'node_modules',dirs_exist_ok=True,copy_function=copy_changed)
     runtime=destination/'runtime';runtime.mkdir(exist_ok=True)
-    node=shutil.which('node')
-    if not node:raise RuntimeError('Node executable missing')
+    node=None
+    for candidate in (ROOT/'offline/node/node.exe', ROOT/'runtime/node.exe'):
+        if candidate.is_file():
+            node=str(candidate)
+            break
+    if not node:node=shutil.which('node')
+    if not node:raise RuntimeError('Node executable missing (offline/node/node.exe or PATH)')
     version=subprocess.check_output([node,'--version'],text=True).strip()
     if version!='v24.13.0':raise RuntimeError('Use pinned Node 24.13.0')
     shutil.copy2(node,runtime/'node.exe')
