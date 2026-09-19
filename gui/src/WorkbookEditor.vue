@@ -164,6 +164,11 @@ async function restore(version: number) {
   await call('workbooks.restore', { task_id: props.taskId, workbook_id: props.workbookId, revision: version, expected_version: record.value!.current_revision })
   emit('extracted', props.workbookId); historyOpen.value = false
 }
+async function undo() {
+  await flush()
+  await call('workbooks.undo', { task_id: props.taskId, workbook_id: props.workbookId, expected_version: record.value!.current_revision })
+  emit('extracted', props.workbookId)
+}
 function updateEditable() {
   editor?.workbook.setEditable(!props.busy && !record.value?.readonly && !exporting.value)
 }
@@ -195,7 +200,7 @@ defineExpose<WorkbookEditorHandle>({ flush, exportFile, getContext: () => { cont
 
 <template>
   <section class="workbook-panel">
-    <div class="workbook-tools"><strong>{{record?.snapshot.name || '工作簿'}}</strong><span class="save-state" :class="{unsaved:dirty || error}" role="status">{{status}}</span><span>{{count.toLocaleString()}} / 200,000 格</span><el-button :disabled="busy || !dirty || saving" @click="flush().catch(report)">保存</el-button><el-button :disabled="busy || !record || record.limitations.length>0" @click="showHistory().catch(report)">历史版本</el-button><el-button type="primary" :disabled="busy || exporting || !record || record.readonly" @click="exportFile().catch(report)">确认并导出</el-button></div>
+    <div class="workbook-tools"><strong>{{record?.snapshot.name || '工作簿'}}</strong><span class="save-state" :class="{unsaved:dirty || error}" role="status">{{status}}</span><span>{{count.toLocaleString()}} / 200,000 格</span><el-button :disabled="busy || !dirty || saving" @click="flush().catch(report)">保存</el-button><el-button :disabled="busy || !record || record.limitations.length>0 || (record.current_revision||0)<=1" @click="undo().catch(report)">撤销一步</el-button><el-button :disabled="busy || !record || record.limitations.length>0" @click="showHistory().catch(report)">历史版本</el-button><el-button type="primary" :disabled="busy || exporting || !record || record.readonly" @click="exportFile().catch(report)">确认并导出</el-button></div>
     <el-alert v-if="error" :title="error" type="error" :closable="false" />
     <el-alert v-if="record?.historical" type="info" :closable="false" :title="`正在查看历史版本 ${record.revision}，当前版本为 ${record.current_revision}。`"><el-button @click="emit('extracted',workbookId)">返回当前版本</el-button><el-button :disabled="busy || record.limitations.length>0" @click="restore(record.revision).catch(report)">恢复此版本</el-button></el-alert>
     <el-alert v-if="record?.limitations.length" type="warning" :closable="false" title="此文件包含首版编辑器未支持的内容，当前只读查看。"><ul><li v-for="item in record.limitations" :key="item">{{item}}</li></ul><el-button v-if="record.source" @click="call('workbooks.open',{task_id:taskId,file_id:record.source,pure_data:true}).then(r=>emit('extracted',r.snapshot.id)).catch(report)">提取纯数据副本并编辑</el-button></el-alert>

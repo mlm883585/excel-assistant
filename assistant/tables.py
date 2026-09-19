@@ -15,6 +15,24 @@ from .models import InputSelection, Operation
 
 SOURCE = ["__source_file", "__source_sheet", "__source_row"]
 
+CHART_TYPES = {"column", "bar", "line", "area", "pie"}
+CHART_AGGREGATES = {"sum", "count", "min", "max", "mean"}
+
+STEP_LABELS = {"append": "合并文件", "join": "按字段关联", "clean": "清理文本", "compare": "对账差异",
+               "group": "分组汇总", "melt": "宽表转长表", "pivot": "长表转矩阵", "template": "填写模板",
+               "recalculate": "Excel 重算", "calculate": "新增计算列", "classify": "条件分级",
+               "create_table": "新建工作簿", "edit_workbook": "编辑工作簿", "report": "数据质量报告",
+               "chart": "生成图表", "pivot_table": "生成透视表", "sql": "SQL 关联"}
+
+
+def emit_step(store, task_id, kind, info):
+    """Record a conversation-visible step card from an operation's output info."""
+    stats = info.get("statistics") or {}
+    store.event(task_id, "step", {"kind": kind, "label": STEP_LABELS.get(kind, kind),
+                                  "output_id": info.get("id"), "output_name": info.get("name"),
+                                  "rows_in": stats.get("input_rows"), "rows_out": stats.get("output_rows"),
+                                  "issues": stats.get("issues")})
+
 
 def records(frame):
     return json.loads(frame.to_json(orient="records", date_format="iso", force_ascii=False))
@@ -124,6 +142,35 @@ def require_columns(frame, columns):
         raise ValueError("请选择存在的字段")
 
 
+def aggregate_pivot(data, rows, columns, values, aggregate="sum"):
+    """Aggregate ``data`` into a wide pivot frame for interactive preview.
+
+    ``rows`` is a non-empty list of row fields, ``columns`` a single column field
+    or None, ``values`` a non-empty list of numeric fields. Returns a flat,
+    reset-indexed DataFrame whose columns are strings.
+    """
+    rows = list(rows or [])
+    columns = columns or None
+    values = list(values or [])
+    if not rows:
+        raise ValueError("请选择至少一个行字段")
+    if not values:
+        raise ValueError("请选择至少一个数值字段")
+    require_columns(data, rows + ([columns] if columns else []) + values)
+    if aggregate not in {"sum", "count", "min", "max", "mean"}:
+        raise ValueError("请选择有效汇总规则")
+    numeric = data.copy()
+    for value in values:
+        numeric[value] = pd.to_numeric(numeric[value], errors="raise")
+    value_arg = values[0] if len(values) == 1 else values
+    result = numeric.pivot_table(index=rows, columns=columns, values=value_arg, aggfunc=aggregate, fill_value=0).reset_index()
+    if isinstance(result.columns, pd.MultiIndex):
+        result.columns = [c if not isinstance(c, tuple) else " · ".join(str(x) for x in c if str(x) != "") for c in result.columns]
+    else:
+        result.columns = [str(c) for c in result.columns]
+    return result
+
+
 def run_operation(store, task_id, operation):
     started = time.perf_counter()
     op = Operation.model_validate(operation)
@@ -195,21 +242,39 @@ def run_operation(store, task_id, operation):
         require_columns(data, keys + columns)
         result = data.melt(id_vars=list(dict.fromkeys(keys + [c for c in SOURCE if c in data.columns])), value_vars=columns, var_name=p.get("variable", "项目"), value_name=p.get("value", "数量"))
     elif op.kind == "pivot":
-        keys, column, value = p.get("keys", []), p.get("column"), p.get("value")
-        require_columns(data, keys + [column, value])
-        aggregate = p.get("aggregate", "sum")
-        if aggregate not in {"sum", "count", "min", "max", "mean"}:
-            raise ValueError("请选择有效汇总规则")
-        numeric = data.copy()
-        numeric[value] = pd.to_numeric(numeric[value], errors="raise")
-        result = numeric.pivot_table(index=keys, columns=column, values=value, aggfunc=aggregate, fill_value=0).reset_index()
-        result.columns = [str(c) for c in result.columns]
+        values = p.get("values")
+        if values is None:
+            value = p.get("value")
+            values = [value] if value else []
+        rows = p.get("rows") or p.get("keys", [])
+        column = p.get("columns") or p.get("column")
+        if isinstance(column, list):
+            column = column[0] if column else None
+        result = aggregate_pivot(data, rows, column, values, p.get("aggregate", "sum"))
         extras["来源明细"] = data
     elif op.kind == "template":
         info = fill_template(store, task_id, op, frames[0])
         from .workbook_results import register_file_result
         register_file_result(store, task_id, op, info)
         return info
+    elif op.kind == "report":
+        return make_report(store, task_id, frames[0])
+    elif op.kind == "chart":
+        return run_chart(store, task_id, frames[0], op.params)
+    elif op.kind == "pivot_table":
+        return run_pivot_table(store, task_id, frames[0], op.params)
+    elif op.kind == "sql":
+        from data_toolkit.sql_runner import run_query, coerce_numeric_columns
+        aliases = p.get("aliases", [])
+        query = p.get("query", "")
+        if not query or not isinstance(aliases, list) or len(aliases) != len(frames):
+            raise ValueError("SQL 关联需要 query 与等量的表别名")
+        for alias in aliases:
+            if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", str(alias)):
+                raise ValueError(f"表别名须为英文标识符: {alias}")
+        result = run_query({alias: coerce_numeric_columns(frame) for alias, frame in zip(aliases, frames)}, query)
+        stats = {"input_tables": list(aliases), "input_rows": [len(f) for f in frames], "output_rows": len(result)}
+        return publish(store, task_id, result, {}, stats, [])
     else:
         raise ValueError("操作不支持")
     if issues:
@@ -289,5 +354,93 @@ def fill_template(store, task_id, op, frame):
     info = {"id": uuid.uuid4().hex, "name": "模板结果.xlsx", "relative": str(output.relative_to(store.directory(task_id))), "statistics": {"written_rows": len(frame)}, "validated": True, "issues": [{"消息": "结构检查通过；公式重算与复杂对象需 Excel 2016 实机验收"}]}
     task = store.get(task_id)
     task["outputs"].append(info)
+    store.save(task)
+    return info
+
+
+def make_report(store, task_id, frame):
+    """Generate a data-quality report xlsx (summary / field profile) without a model."""
+    from data_toolkit.profiling import profile_dataframe
+    from data_toolkit.reporting import write_report
+    columns = [c for c in frame.columns if not str(c).startswith('__source_')]
+    data = frame[columns].replace(r'^\s*$', None, regex=True)
+    summary = {'行数': len(data), '字段数': len(columns), '空值单元格': int(data.isna().sum().sum()), '重复行': int(data.duplicated().sum())}
+    output_id = uuid.uuid4().hex
+    folder = store.directory(task_id) / 'outputs'
+    folder.mkdir(exist_ok=True)
+    target = folder / f'{output_id}.xlsx'
+    write_report(target, summary=summary, field_profile=profile_dataframe(data), issues=None)
+    info = {'id': output_id, 'name': '数据质量报告.xlsx', 'relative': str(target.relative_to(store.directory(task_id))), 'statistics': summary, 'validated': True, 'issues': []}
+    task = store.get(task_id)
+    task['outputs'].append(info)
+    store.save(task)
+    return info
+
+
+def run_chart(store, task_id, frame, spec):
+    """Aggregate a frame into a chart: native Excel chart plus inline data for preview."""
+    chart_type = spec.get('chart_type', 'column')
+    if chart_type not in CHART_TYPES:
+        raise ValueError('不支持的图表类型')
+    aggregate = spec.get('aggregate', 'sum')
+    if aggregate not in CHART_AGGREGATES:
+        raise ValueError('不支持的聚合方式')
+    category = spec.get('category')
+    values = spec.get('values') or []
+    if not category or not values:
+        raise ValueError('请指定分类字段与至少一个数值字段')
+    if chart_type == 'pie' and len(values) != 1:
+        raise ValueError('饼图需要一个数值字段')
+    columns = [c for c in frame.columns if not str(c).startswith('__source_')]
+    data = frame[columns]
+    require_columns(data, [category] + list(values))
+    numeric = data.copy()
+    for value in values:
+        numeric[value] = pd.to_numeric(numeric[value], errors='raise')
+    result = numeric.groupby(category, dropna=False, sort=False)[values].agg(aggregate).reset_index()
+    truncated = len(result) > 200
+    if truncated:
+        result = result.sort_values(values[0], ascending=False).head(200)
+    chart = {'type': chart_type, 'category': category, 'labels': result[category].tolist(), 'series': [{'name': str(v), 'values': result[v].tolist()} for v in values]}
+    title = spec.get('title')
+    if title:
+        chart['title'] = title
+    output_id = uuid.uuid4().hex
+    folder = store.directory(task_id) / 'outputs'
+    folder.mkdir(exist_ok=True)
+    target = folder / f'{output_id}.xlsx'
+    with pd.ExcelWriter(target, engine='xlsxwriter', engine_kwargs={'options': {'strings_to_formulas': False, 'strings_to_urls': False}}) as writer:
+        result.to_excel(writer, index=False, sheet_name='图表数据')
+        native = writer.book.add_chart({'type': chart_type})
+        last = len(result)
+        for index, value in enumerate(values):
+            native.add_series({'name': str(value), 'categories': ['图表数据', 1, 0, last, 0], 'values': ['图表数据', 1, index + 1, last, index + 1]})
+        if title:
+            native.set_title({'name': title})
+        writer.book.add_worksheet('图表').insert_chart('B2', native)
+    check = load_workbook(target, read_only=True)
+    check.close()
+    info = {'id': output_id, 'name': '图表.xlsx', 'relative': str(target.relative_to(store.directory(task_id))), 'statistics': {'input_rows': len(data), 'output_rows': len(result), 'category': category, 'values': values, 'chart_type': chart_type, 'truncated': truncated}, 'chart': chart, 'validated': True, 'issues': []}
+    task = store.get(task_id)
+    task['outputs'].append(info)
+    store.save(task)
+    return info
+
+
+def run_pivot_table(store, task_id, frame, spec):
+    """Generate a native Excel pivot table (xl/pivotTables/ + cache parts)."""
+    from .pivot_excel import build_pivot_xlsx
+    output_id = uuid.uuid4().hex
+    folder = store.directory(task_id) / 'outputs'
+    folder.mkdir(exist_ok=True)
+    target = folder / f'{output_id}.xlsx'
+    build_pivot_xlsx(frame, spec, target)
+    stats = {'input_rows': len(frame), 'rows': spec.get('rows'), 'columns': spec.get('columns'),
+             'values': spec.get('values'), 'name': spec.get('name')}
+    info = {'id': output_id, 'name': '透视表.xlsx', 'relative': str(target.relative_to(store.directory(task_id))),
+            'statistics': stats, 'validated': True,
+            'issues': [{'消息': '已生成原生透视表；请用 Excel 打开核对字段与汇总结果（结构检查通过，公式与对象需 Excel 实机验收）'}]}
+    task = store.get(task_id)
+    task['outputs'].append(info)
     store.save(task)
     return info

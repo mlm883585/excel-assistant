@@ -96,7 +96,7 @@ export function useTaskSession(options: Options) {
   function schedule() {
     clearTimeout(timer)
     if (!disposed && busy.value) {
-      const delay = document.hidden ? 5000 : task.value?.status === 'waiting' ? 3000 : 1000
+      const delay = document.hidden ? 5000 : task.value?.status === 'waiting' ? 3000 : 400
       timer = setTimeout(() => void fetchUpdates().catch(options.report), delay)
     }
   }

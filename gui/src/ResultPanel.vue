@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import FilePreview from './FilePreview.vue'
+import ChartPreview from './ChartPreview.vue'
 import { call, type Task } from './rpc'
 import { ElMessage } from 'element-plus'
 import type { OutputReview, OutputChange, ExportResult } from './workbook/types'
@@ -72,7 +73,7 @@ async function exportLarge() {
   } catch (error) { if (!disposed) ElMessage.error(String(error)) }
   finally { applying.value = false }
 }
-const operationNames:Record<string,string>={calculate:'新增计算列',classify:'条件分级',create_table:'新建表格',edit_workbook:'区域编辑',clean:'数据清洗',group:'分组汇总',pivot:'矩阵转换',melt:'宽表转长表',join:'字段关联',append:'文件合并',compare:'对账'}
+const operationNames:Record<string,string>={calculate:'新增计算列',classify:'条件分级',create_table:'新建表格',edit_workbook:'区域编辑',clean:'数据清洗',group:'分组汇总',pivot:'矩阵转换',pivot_table:'透视表',melt:'宽表转长表',join:'字段关联',append:'文件合并',compare:'对账'}
 watch(() => props.task.outputs.map(f => f.id).join(','), () => { selected.value = props.task.outputs.at(-1)?.id || '' }, { immediate: true })
 const file = computed(() => props.task.outputs.find(f => f.id === selected.value))
 const labels: Record<string, string> = { input_rows: '各输入表行数', output_rows: '输出行数', issues: '问题总数', written_rows: '写入行数', recalculated: '已执行 Excel 重算' }
@@ -110,6 +111,7 @@ const issueColumns = computed(() => [...new Set((file.value?.issues || []).flatM
       <div class="metrics"><div v-for="[key,v] in metrics" :key="key"><span>{{labels[key]}}</span><strong>{{value(v)}}</strong></div></div>
       <details v-if="extra.length"><summary>其他统计</summary><p v-for="[key,v] in extra" :key="key">{{key}}：{{value(v)}}</p></details>
       <details v-if="file.issues?.length" class="issues" open><summary>检查事项 · 当前展示 {{file.issues.length}} 条<span v-if="file.statistics?.issues!==undefined"> / 共 {{file.statistics.issues}} 条</span></summary><p class="muted">完整问题记录请查看输出工作簿的“问题明细”；模板提示不代表公式实机验收已完成。</p><el-table :data="file.issues" max-height="220"><el-table-column v-for="key in issueColumns" :key="key" :label="key" min-width="150"><template #default="{row}">{{value(row[key])}}</template></el-table-column></el-table></details>
+      <ChartPreview v-if="file.chart" :chart="file.chart" />
       <FilePreview v-if="file.kind!=='workbook_candidate'" :task-id="task.id" :file="file" :busy="busy" />
     </template>
   </section>

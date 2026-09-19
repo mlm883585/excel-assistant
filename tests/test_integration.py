@@ -77,7 +77,7 @@ class IntegrationTests(unittest.TestCase):
                     async with ClientSession(reader, writer) as session:
                         await session.initialize()
                         tools = await session.list_tools()
-                        self.assertEqual(len(tools.tools),5)
+                        self.assertEqual(len(tools.tools),13)
                         result = await session.call_tool('datacraft_execute',{'operation':{'kind':'append','inputs':[{'file_id':file['id']}],'params':{}}})
                         self.assertFalse(result.isError)
                         for operation in [
@@ -105,6 +105,24 @@ class IntegrationTests(unittest.TestCase):
                 self.assertFalse(process.is_alive())
                 self.assertEqual(store.get(task)['status'],'succeeded')
                 self.assertEqual(len(store.get(task)['outputs']),1)
+            finally:
+                jobs.close()
+
+    def test_report_job_without_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            store = Store(Path(tmp)/'data')
+            task = store.create()['id']
+            source = Path(tmp)/'data.csv'; source.write_text('item,qty\nA,10\nB,20\n')
+            file = store.import_file(task, source)
+            jobs = Jobs(store)
+            try:
+                jobs.start(task, plan={'steps': [{'kind': 'report', 'inputs': [{'file_id': file['id']}], 'params': {}}]})
+                process = jobs.processes[task]; process.join(30)
+                self.assertFalse(process.is_alive())
+                record = store.get(task)
+                self.assertEqual(record['status'], 'succeeded')
+                self.assertEqual(len(record['outputs']), 1)
+                self.assertEqual(record['outputs'][0]['name'], '数据质量报告.xlsx')
             finally:
                 jobs.close()
 

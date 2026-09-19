@@ -157,7 +157,7 @@ class Block(importlib.abc.MetaPathFinder):
 sys.meta_path.insert(0, Block())
 from api import api
 assert api.runtime_status()['ready'] is False
-assert api.settings_get() == {'base_url': '', 'model': ''}
+assert api.settings_get() == {'base_url': '', 'model': '', 'fallback': {'base_url': '', 'model': ''}, 'agent_backend': 'native'}
 api.shutdown()
 '''
         result = subprocess.run([sys.executable, '-c', code], env={**os.environ, 'EXCEL_ASSISTANT_HOME': str(self.root / 'isolated')}, capture_output=True, text=True, timeout=10)

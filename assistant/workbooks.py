@@ -124,6 +124,14 @@ class Workbooks:
         self.save(task, snapshot, expected_version, 'restore')
         return self.load(task, workbook_id)
 
+    def undo(self, task, workbook_id, expected_version):
+        record = self.load(task, workbook_id, expected_version)
+        if record['current_revision'] != expected_version:
+            raise ValueError('工作簿已改变，请重新核对')
+        if record['current_revision'] <= 1:
+            raise ValueError('已是初始版本，无法撤销')
+        return self.restore(task, workbook_id, record['current_revision'] - 1, expected_version)
+
     def input(self, task, selection):
         """Fixed-revision input; its immutable snapshot also provides source coordinates."""
         record = self.load(task, selection.workbook_id, selection.version)

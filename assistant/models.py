@@ -37,7 +37,7 @@ class TaskSpec(StrictModel):
 
 
 class Operation(StrictModel):
-    kind: Literal["append", "join", "clean", "compare", "group", "melt", "pivot", "template", "recalculate", "calculate", "classify", "create_table", "edit_workbook"]
+    kind: Literal["append", "join", "clean", "compare", "group", "melt", "pivot", "template", "recalculate", "calculate", "classify", "create_table", "edit_workbook", "report", "chart", "pivot_table", "sql"]
     inputs: list[InputSelection] = Field(default_factory=list, max_length=10)
     params: dict[str, Any] = Field(default_factory=dict)
 
@@ -48,12 +48,12 @@ class Operation(StrictModel):
                 raise ValueError('建表不接收输入文件')
         elif not self.inputs:
             raise ValueError('此操作需要输入')
-        if self.kind in {'calculate', 'classify', 'edit_workbook'} and len(self.inputs) != 1:
+        if self.kind in {'calculate', 'classify', 'edit_workbook', 'report', 'chart', 'pivot_table'} and len(self.inputs) != 1:
             raise ValueError('此操作需要一个明确输入')
         if self.kind == 'edit_workbook' and not self.inputs[0].workbook_id:
             raise ValueError('编辑须指定工作簿版本与工作表')
-        if self.kind in {'template', 'recalculate'} and any(i.workbook_id for i in self.inputs):
-            raise ValueError('模板和 Excel 原生重算使用文件输入，请先导出副本')
+        if self.kind in {'template', 'recalculate', 'report', 'chart', 'pivot_table'} and any(i.workbook_id for i in self.inputs):
+            raise ValueError('模板、Excel 原生重算、数据报告、图表和透视表使用文件输入，请先导出副本')
         return self
 
 

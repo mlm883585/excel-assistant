@@ -12,6 +12,7 @@ _jobs = None
 _lock = threading.RLock()
 _environment = None
 _previews = None
+_scheduler = None
 
 
 def services():
@@ -123,6 +124,20 @@ def preview_file(task_id: str, selection: dict, offset: int = 0, limit: int = 50
     return preview(services()[0], task_id, selection, offset, limit)
 
 
+@api_method("pivot.preview")
+@guarded
+def pivot_preview(task_id: str, selection: dict, rows: list, columns: list, values: list, aggregate: str = 'sum'):
+    from assistant.tables import read, aggregate_pivot, records
+    from assistant.models import InputSelection
+    store, _ = services()
+    frame = read(store, task_id, InputSelection.model_validate(selection))
+    result = aggregate_pivot(frame, rows, columns[0] if columns else None, values, aggregate)
+    cells = len(result) * len(result.columns)
+    if cells > 5000:
+        raise ValueError('结果超过 5000 个单元格，请缩小行列或聚合范围')
+    return {"columns": result.columns.tolist(), "rows": records(result), "total": cells}
+
+
 @api_method("files.open")
 @guarded
 def open_file(task_id: str, file_id: str):
@@ -147,19 +162,28 @@ def config_path():
 def settings_get():
     path = config_path()
     raw = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
-    return {key: raw.get(key, '') for key in ['base_url', 'model']}
+    fallback = raw.get('fallback') or {}
+    return {'base_url': raw.get('base_url', ''), 'model': raw.get('model', ''),
+            'fallback': {'base_url': fallback.get('base_url', ''), 'model': fallback.get('model', '')},
+            'agent_backend': raw.get('agent_backend') or 'native'}
 
 
 @api_method("settings.save")
 @guarded
-def settings_save(base_url: str, model: str):
-    from urllib.parse import urlparse
-    parsed = urlparse(base_url)
-    if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
-        raise ValueError("请输入内网 HTTP(S) 模型地址")
+def settings_save(base_url: str, model: str, fallback_base_url: str = '', fallback_model: str = '', agent_backend: str = 'native'):
+    from assistant.model_registry import validate_base_url
+    base_url = validate_base_url(base_url)
     if not model.strip():
         raise ValueError('请输入实际 model 标识')
-    config = {"base_url":base_url.rstrip("/"), "model":model.strip()}
+    if agent_backend not in {'native', 'qwen'}:
+        raise ValueError('请选择原生直连或 Qwen Code 后端')
+    config = {"base_url": base_url, "model": model.strip(), "agent_backend": agent_backend}
+    fallback_base_url = (fallback_base_url or '').strip()
+    fallback_model = (fallback_model or '').strip()
+    if fallback_base_url or fallback_model:
+        if not fallback_base_url or not fallback_model:
+            raise ValueError('备用模型服务需要同时填写地址与 model 标识')
+        config["fallback"] = {"base_url": validate_base_url(fallback_base_url), "model": fallback_model}
     config_path().parent.mkdir(parents=True, exist_ok=True)
     config_path().write_text(json.dumps(config, ensure_ascii=False), encoding="utf-8")
     return True
@@ -182,9 +206,18 @@ def agent(task_id: str, prompt: str, selections: list[dict], editing_selection: 
             store.resolve_file(task_id, selection.file_id)
     with _lock:
         check_execution()
-        selected = environment().runtime.selected()
-        config = {**settings_get(), 'cli': selected['cli'], 'node_executable': selected['node_executable'], 'runtime_fingerprint': selected['fingerprint']}
-        AgentRunner(store, task_id, config).options()
+        from assistant.model_registry import choose
+        settings = settings_get()
+        endpoint = choose(settings)
+        backend = (settings.get('agent_backend') or 'native')
+        config = {'base_url': endpoint['base_url'], 'model': endpoint['model'],
+                  'api_key_env': endpoint['key_env'], 'model_source': endpoint['used'],
+                  'backend': backend}
+        if backend == 'qwen':
+            selected = environment().runtime.selected()
+            config.update(cli=selected['cli'], node_executable=selected['node_executable'],
+                          runtime_fingerprint=selected['fingerprint'])
+            AgentRunner(store, task_id, config).options()
         scope = None
         if editing_selection:
             scope = InputSelection.model_validate(editing_selection)
@@ -199,6 +232,7 @@ def agent(task_id: str, prompt: str, selections: list[dict], editing_selection: 
         store.save(record)
         request = prompt + "\n用户选定的输入与表头：" + json.dumps(selections, ensure_ascii=False)
         store.event(task_id, "user", prompt)
+        store.event(task_id, "message", f"已连接模型服务：{endpoint['model']}（{'备用' if endpoint['used'] == 'fallback' else '主'} · {'Qwen Code' if backend == 'qwen' else '原生直连'}）")
         return jobs.start(task_id, prompt=request, config=config)
 
 
@@ -244,6 +278,64 @@ def apply_recipe(task_id: str, recipe_id: str):
         return jobs.start(task_id, plan=plan)
 
 
+def scheduler():
+    global _scheduler
+    with _lock:
+        if _scheduler is None:
+            from assistant.scheduler import SchedulerService
+            _scheduler = SchedulerService(services()[0], services()[1])
+            _scheduler.start()
+        return _scheduler
+
+
+def start_scheduler():
+    scheduler()
+
+
+@api_method("automation.list")
+@guarded
+def automation_list():
+    return scheduler().list()
+
+
+@api_method("automation.status")
+@guarded
+def automation_status():
+    return scheduler().status()
+
+
+@api_method("automation.save")
+@guarded
+def automation_save(schedule: dict):
+    return scheduler().save(schedule)
+
+
+@api_method("automation.delete")
+@guarded
+def automation_delete(schedule_id: str):
+    return scheduler().delete(schedule_id)
+
+
+@api_method("automation.toggle")
+@guarded
+def automation_toggle(schedule_id: str, enabled: bool):
+    return scheduler().toggle(schedule_id, enabled)
+
+
+@api_method("automation.run")
+@guarded
+def automation_run(schedule_id: str):
+    return scheduler().run_now(schedule_id)
+
+
+@api_method("automation.choose_folder")
+@guarded
+def automation_choose_folder():
+    import webview
+    paths = webview.windows[0].create_file_dialog(webview.FOLDER_DIALOG)
+    return paths[0] if paths else None
+
+
 def environment():
     global _environment
     with _lock:
@@ -278,11 +370,19 @@ def ensure_idle():
 def runtime_status():
     from assistant.diagnostics import excel_installed
     service = environment()
-    try:
-        selected = service.runtime.selected()
-        status = {'ready': True, 'selected': selected, 'message': '运行环境已验证'}
-    except ValueError as exc:
-        status = {'ready': False, 'selected': None, 'message': str(exc)}
+    settings = settings_get()
+    backend = settings.get('agent_backend') or 'native'
+    model_ready = bool((settings.get('base_url') or '').strip() and (settings.get('model') or '').strip())
+    if backend == 'qwen':
+        try:
+            selected = service.runtime.selected()
+            status = {'ready': model_ready, 'selected': selected, 'message': '运行环境已验证'}
+        except ValueError as exc:
+            status = {'ready': False, 'selected': None, 'message': str(exc)}
+    else:
+        status = {'ready': model_ready, 'selected': None,
+                  'message': '原生直连' if model_ready else '请先保存模型服务地址与 model 标识'}
+    status['backend'] = backend
     status['first_use'] = not service.runtime.path.exists()
     status['excel_ready'] = excel_installed() and service.results.get('excel', {}).get('status') != 'fail'
     return status
@@ -328,8 +428,10 @@ def runtime_select(candidate_id: str):
 
 @api_method('diagnostics.check')
 @guarded
-def diagnostics_check(kind: str):
-    return environment().check(kind, settings_get() if kind == 'model' else None)
+def diagnostics_check(kind: str, config: dict | None = None):
+    if kind == 'model':
+        return environment().check(kind, config if config is not None else settings_get())
+    return environment().check(kind, None)
 
 
 @api_method('diagnostics.get')
@@ -373,6 +475,8 @@ def diagnostics_install():
 
 
 def shutdown():
+    if _scheduler:
+        _scheduler.close()
     if _previews:
         _previews.close()
     if _environment:
@@ -417,6 +521,13 @@ def workbook_versions(task_id: str, workbook_id: str, offset: int = 0, limit: in
 def workbook_restore(task_id: str, workbook_id: str, revision: int, expected_version: int):
     with _lock:
         return workbooks().restore(task_id, workbook_id, revision, expected_version)
+
+
+@api_method('workbooks.undo')
+@guarded
+def workbook_undo(task_id: str, workbook_id: str, expected_version: int):
+    with _lock:
+        return workbooks().undo(task_id, workbook_id, expected_version)
 
 
 @api_method('outputs.review')
