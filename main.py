@@ -24,6 +24,8 @@ def main():
     app.register_api(api)
     import atexit
     atexit.register(api.shutdown)
+    if '--smoke' not in sys.argv:
+        api.start_scheduler()
     if '--smoke' in sys.argv:
         from assistant.store import data_root
         for name in ('desktop-smoke.ok', 'desktop-smoke.failed', 'desktop-branding.json'):

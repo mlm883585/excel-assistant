@@ -23,6 +23,7 @@ class Store:
                 CREATE INDEX IF NOT EXISTS events_task_id ON events(task, id);
                 CREATE INDEX IF NOT EXISTS tasks_updated_id ON tasks(updated DESC, id DESC);
                 CREATE TABLE IF NOT EXISTS recipes(id TEXT PRIMARY KEY, body TEXT NOT NULL);
+                CREATE TABLE IF NOT EXISTS schedules(id TEXT PRIMARY KEY, body TEXT NOT NULL);
             ''')
 
     @contextmanager
@@ -157,3 +158,24 @@ class Store:
             for item in step["inputs"]:
                 item["file_id"] = files[int(item["file_id"].split(":")[1])]["id"]
         return recipe["plan"]
+
+    def save_schedule(self, schedule):
+        with self.connect() as db:
+            db.execute("INSERT INTO schedules(id,body) VALUES(?,?) ON CONFLICT(id) DO UPDATE SET body=excluded.body", (schedule["id"], json.dumps(schedule, ensure_ascii=False)))
+        return schedule
+
+    def schedules(self):
+        with self.connect() as db:
+            return [json.loads(row[0]) for row in db.execute("SELECT body FROM schedules ORDER BY json_extract(body,'$.created_at') DESC")]
+
+    def get_schedule(self, schedule_id):
+        with self.connect() as db:
+            row = db.execute("SELECT body FROM schedules WHERE id=?", (schedule_id,)).fetchone()
+        if not row:
+            raise ValueError("自动化任务不存在")
+        return json.loads(row[0])
+
+    def delete_schedule(self, schedule_id):
+        with self.connect() as db:
+            cur = db.execute("DELETE FROM schedules WHERE id=?", (schedule_id,))
+        return cur.rowcount > 0

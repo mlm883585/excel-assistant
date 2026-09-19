@@ -7,7 +7,7 @@ import uuid
 
 from .store import Store
 from .models import OperationPlan
-from .tables import run_operation
+from .tables import run_operation, emit_step
 from .agent import AgentRunner
 
 
@@ -15,13 +15,18 @@ def worker(root, task_id, plan, prompt, config):
     store = Store(Path(root))
     try:
         if prompt is not None:
-            asyncio.run(AgentRunner(store, task_id, config).run(prompt))
+            if (config or {}).get("backend") == "qwen":
+                asyncio.run(AgentRunner(store, task_id, config).run(prompt))
+            else:
+                from .planner import NativeAgent
+                NativeAgent(store, task_id, config).run(prompt)
         else:
             validated = OperationPlan.model_validate(plan)
             for i, operation in enumerate(validated.steps):
                 store.event(task_id, "progress", f"正在执行第 {i + 1}/{len(validated.steps)} 步：{operation.kind}")
                 output = run_operation(store, task_id, operation.model_dump())
                 store.event(task_id, "output", output)
+                emit_step(store, task_id, operation.kind, output)
         store.finish_reviews(task_id, True)
         record = store.get(task_id)
         record["status"] = "succeeded"
@@ -46,6 +51,10 @@ class Jobs:
                 store.finish_reviews(task['id'], False)
                 task.update(status="failed", error="应用上次退出时任务中断，请重新执行")
                 store.save(task)
+
+    def busy(self):
+        with self.lock:
+            return any(p.is_alive() for p in self.processes.values())
 
     def start(self, task_id, plan=None, prompt=None, config=None):
         if prompt is None:
